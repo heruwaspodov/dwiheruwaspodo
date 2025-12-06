@@ -1,0 +1,30 @@
+{
+  "name": "vcard-personal-portfolio",
+  "version": "1.0.0",
+  "description": "<div align=\"center\">",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "deploy": "vite build && firebase deploy"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/codingstella/vCard-personal-portfolio.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/codingstella/vCard-personal-portfolio/issues"
+  },
+  "homepage": "https://github.com/codingstella/vCard-personal-portfolio#readme",
+  "dependencies": {
+    "firebase": "^12.6.0",
+    "firebase-admin": "^13.6.0",
+    "vite": "^7.2.6"
+  }
+}
