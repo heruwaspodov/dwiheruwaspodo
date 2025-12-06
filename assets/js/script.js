@@ -175,9 +175,205 @@ function checkPermissionError(error) {
   }
 }
 
+async function loadExperience() {
+  try {
+    const experienceList = document.querySelector("[data-experience-list]");
+    if (!experienceList) return;
+
+    const worksSnap = await getDocs(collection(firestore, "works"));
+    if (!worksSnap.empty) {
+      experienceList.innerHTML = "";
+
+      let worksData = [];
+      worksSnap.forEach((doc) => {
+        worksData.push({ id: doc.id, ...doc.data() });
+      });
+
+      // Helper to format Firestore timestamp to "Month Year"
+      const formatDate = (timestamp) => {
+        if (!timestamp) return null;
+        let date;
+        // Handle Firestore Timestamp (has .toDate())
+        if (timestamp.toDate && typeof timestamp.toDate === "function") {
+          date = timestamp.toDate();
+        } else {
+          // Handle string or Date object
+          date = new Date(timestamp);
+        }
+
+        if (isNaN(date.getTime())) return "";
+
+        return date.toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "short",
+        });
+      };
+
+      // Sort: Mekari first, then descending by date_start
+      worksData.sort((a, b) => {
+        // Safe check for company/title string existence
+        const companyA = a.company ? String(a.company).toLowerCase() : "";
+        const titleA = a.title ? String(a.title).toLowerCase() : "";
+        const isMekariA =
+          companyA.includes("mekari") || titleA.includes("mekari");
+
+        const companyB = b.company ? String(b.company).toLowerCase() : "";
+        const titleB = b.title ? String(b.title).toLowerCase() : "";
+        const isMekariB =
+          companyB.includes("mekari") || titleB.includes("mekari");
+
+        if (isMekariA && !isMekariB) return -1;
+        if (!isMekariA && isMekariB) return 1;
+
+        // Descending sort by date_start
+        const getSeconds = (val) => {
+          if (!val) return 0;
+          if (val.seconds) return val.seconds; // Firestore Timestamp
+          return new Date(val).getTime() / 1000;
+        };
+
+        return getSeconds(b.date_start) - getSeconds(a.date_start);
+      });
+
+      worksData.forEach((work) => {
+        const li = document.createElement("li");
+        li.className = "timeline-item";
+
+        // Construct period string from date_start and date_end
+        let period = "";
+        const startStr = formatDate(work.date_start);
+        // If date_end is null/undefined, it means "Present"
+        const endStr = work.date_end ? formatDate(work.date_end) : "Present";
+
+        if (startStr) {
+          period = `${startStr} — ${endStr}`;
+        } else {
+          // Fallback for legacy fields
+          period = work.period || work.year || "";
+        }
+
+        li.innerHTML = `
+          <h4 class="h4 timeline-item-title">${work.title || work.role || "Job Title"}</h4>
+          ${work.company ? `<span style="display:block; font-weight:500; color: var(--orange-yellow-crayola); margin-bottom: 4px;">${work.company}</span>` : ""}
+          <span style="display:block; font-size: 14px; color: var(--light-gray); margin-bottom: 10px;">${period}</span>
+          <p class="timeline-text">
+            ${work.description || ""}
+          </p>
+        `;
+        experienceList.appendChild(li);
+      });
+    }
+  } catch (error) {
+    console.error("Error loading Experience:", error);
+  }
+}
+
+async function loadEducation() {
+  try {
+    const educationList = document.querySelector("[data-education-list]");
+    if (!educationList) return;
+
+    const eduSnap = await getDocs(collection(firestore, "educations"));
+    if (!eduSnap.empty) {
+      educationList.innerHTML = "";
+
+      let eduData = [];
+      eduSnap.forEach((doc) => {
+        eduData.push({ id: doc.id, ...doc.data() });
+      });
+
+      // Sort desc by date if possible
+      eduData.sort((a, b) => {
+        const dateA = a.startDate || a.year || a.period || "";
+        const dateB = b.startDate || b.year || b.period || "";
+
+        if (dateA > dateB) return -1;
+        if (dateA < dateB) return 1;
+        return 0;
+      });
+
+      eduData.forEach((edu) => {
+        const li = document.createElement("li");
+        li.className = "timeline-item";
+
+        let period = "";
+        if (edu.startDate && edu.endDate) {
+          period = `${edu.startDate} — ${edu.endDate}`;
+        } else if (edu.period) {
+          period = edu.period;
+        } else if (edu.year) {
+          period = edu.year;
+        }
+
+        li.innerHTML = `
+          <h4 class="h4 timeline-item-title">${edu.institution || edu.school || "School"}</h4>
+          <span>${period}</span>
+          <p class="timeline-text">
+            ${edu.description || edu.degree || ""}
+          </p>
+        `;
+        educationList.appendChild(li);
+      });
+    }
+  } catch (error) {
+    console.error("Error loading Education:", error);
+  }
+}
+
+async function loadSkills() {
+  try {
+    const skillsList = document.querySelector("[data-skills-list]");
+    if (!skillsList) return;
+
+    const skillsSnap = await getDocs(collection(firestore, "skills"));
+    if (!skillsSnap.empty) {
+      skillsList.innerHTML = "";
+
+      let skillsData = [];
+      skillsSnap.forEach((doc) => {
+        skillsData.push({ id: doc.id, ...doc.data() });
+      });
+
+      // Sort Descending by Strength
+      skillsData.sort((a, b) => (b.strength || 0) - (a.strength || 0));
+
+      skillsData.forEach((item) => {
+        const strength = item.strength || 0;
+        const percentage = strength * 10; // Convert 1-10 scale to 0-100%
+        const name = item.skill || "Skill";
+
+        const li = document.createElement("li");
+        li.className = "skills-item";
+
+        li.innerHTML = `
+          <div class="title-wrapper">
+            <h5 class="h5">${name}</h5>
+            <data value="${percentage}">${percentage}%</data>
+          </div>
+
+          <div class="skill-progress-bg">
+            <div class="skill-progress-fill" style="width: ${percentage}%"></div>
+          </div>
+        `;
+
+        skillsList.appendChild(li);
+      });
+    }
+  } catch (error) {
+    console.error("Error loading Skills:", error);
+  }
+}
+
 // Master init function
 async function initApp() {
-  await Promise.all([loadBio(), loadRoles(), loadContacts()]);
+  await Promise.all([
+    loadBio(),
+    loadRoles(),
+    loadContacts(),
+    loadExperience(),
+    loadEducation(),
+    loadSkills(), // Added
+  ]);
 }
 
 // Start Data Loading
