@@ -713,6 +713,16 @@ async function loadCompanies() {
       return;
     }
 
+    // Sort by date_start (most recent first) to ensure better alignment
+    companies.sort((a, b) => {
+      const getSeconds = (val) => {
+        if (!val) return 0;
+        if (val.seconds) return val.seconds; // Firestore Timestamp
+        return new Date(val).getTime() / 1000;
+      };
+      return getSeconds(b.date_start) - getSeconds(a.date_start);
+    });
+
     clientsList.innerHTML = "";
 
     companies.forEach(comp => {
