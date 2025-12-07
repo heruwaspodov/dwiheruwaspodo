@@ -651,18 +651,22 @@ main {
 
 .testimonials-list {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  grid-template-rows: repeat(2, 1fr);
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(300px, 350px);
   gap: 15px;
   margin: 0 -15px;
   padding: 25px 15px;
   padding-bottom: 35px;
-  overflow-x: visible;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  overscroll-behavior-inline: contain;
+  scroll-snap-type: inline mandatory;
 }
 
 .testimonials-item {
   display: flex;
-  flex-direction: column;
-  scroll-snap-align: center;
+  scroll-snap-align: start;
 }
 
 .testimonials-avatar-box {
