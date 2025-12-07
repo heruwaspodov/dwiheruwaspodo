@@ -650,21 +650,18 @@ main {
 }
 
 .testimonials-list {
-  display: flex;
-  justify-content: flex-start;
-  align-items: flex-start;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 15px;
   margin: 0 -15px;
   padding: 25px 15px;
   padding-bottom: 35px;
-  overflow-x: auto;
-  scroll-behavior: smooth;
-  overscroll-behavior-inline: contain;
-  scroll-snap-type: inline mandatory;
+  overflow-x: visible;
 }
 
 .testimonials-item {
-  min-width: 100%;
+  display: flex;
+  flex-direction: column;
   scroll-snap-align: center;
 }
 
