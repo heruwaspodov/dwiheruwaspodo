@@ -368,12 +368,13 @@ main {
 
 .avatar-box {
   background: var(--bg-gradient-onyx);
-  border-radius: 50%;
+  border-radius: 20px;
+  /* Reduced radius for mobile aesthetics */
   overflow: hidden;
-  width: 150px;
-  height: 150px;
-  margin-inline: auto;
-  /* Center it */
+  width: 80px;
+  /* Smaller for mobile */
+  height: 80px;
+  /* margin-inline: auto; Removed to align left on mobile if Sidebar is row */
 }
 
 .avatar-box img {
@@ -842,18 +843,21 @@ main {
 }
 
 .clients-item {
-  min-width: 50%;
+  min-width: max-content;
+  /* Allow item to fit content, preventing huge gaps */
+  padding-right: 20px;
+  /* Add some spacing */
   scroll-snap-align: start;
 }
 
 .clients-item img {
-  width: 100%;
-  filter: grayscale(1);
+  width: auto;
+  /* Fit image size */
   transition: var(--transition-1);
 }
 
 .clients-item img:hover {
-  filter: grayscale(0);
+  /* No filter change needed */
 }
 
 
@@ -1409,7 +1413,7 @@ textarea.form-input::-webkit-resizer {
    */
 
   .clients-item {
-    min-width: calc(33.33% - 10px);
+    min-width: auto;
   }
 
 
@@ -1483,6 +1487,13 @@ textarea.form-input::-webkit-resizer {
     height: 48px;
     border-radius: 12px;
     font-size: 18px;
+  }
+
+  .avatar-box {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    margin-inline: auto;
   }
 
 
@@ -1687,7 +1698,7 @@ textarea.form-input::-webkit-resizer {
   }
 
   .clients-item {
-    min-width: calc(33.33% - 35px);
+    min-width: auto;
   }
 
 
@@ -1993,7 +2004,7 @@ textarea.form-input::-webkit-resizer {
   /* clients */
 
   .clients-item {
-    min-width: calc(25% - 38px);
+    min-width: auto;
   }
 
 
