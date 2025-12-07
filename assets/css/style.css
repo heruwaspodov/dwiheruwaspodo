@@ -655,8 +655,8 @@ main {
   grid-auto-flow: column;
   grid-auto-columns: minmax(300px, 350px);
   gap: 15px;
-  margin: 0 -15px;
-  padding: 25px 15px;
+  margin: 0;
+  padding: 25px;
   padding-bottom: 35px;
   overflow-x: auto;
   scroll-behavior: smooth;
