@@ -533,6 +533,160 @@ async function loadActivity() {
   }
 }
 
+async function loadPortfolio() {
+  try {
+    const projectList = document.querySelector("[data-project-list]");
+    if (!projectList) return;
+
+    // Modal Elements
+    const modalContainer = document.querySelector("[data-modal-container]");
+    const modalCloseBtn = document.querySelector("[data-modal-close-btn]");
+    const modalOverlay = document.querySelector("[data-modal-overlay]");
+
+    // Modal Content Elements
+    const modalTitle = document.querySelector("[data-modal-title]");
+    const modalCategory = document.querySelector("[data-modal-category]");
+    const modalText = document.querySelector("[data-modal-text]");
+    const modalImg = document.querySelector("[data-modal-img]");
+    const modalImgWrapper = document.querySelector("[data-modal-img-wrapper]");
+
+    // Close Modal Function
+    const closeModal = () => {
+      if (modalContainer) modalContainer.classList.remove("active");
+      if (modalOverlay) modalOverlay.classList.remove("active");
+    };
+
+    // Add Close Listeners (check if already added to avoid dupes if re-run, but initApp runs once)
+    if (modalCloseBtn) modalCloseBtn.onclick = closeModal;
+    if (modalOverlay) modalOverlay.onclick = closeModal;
+
+
+    const worksSnap = await getDocs(collection(firestore, "works"));
+    const allProjects = [];
+
+    worksSnap.forEach((doc) => {
+      const data = doc.data();
+      if (data.projects && Array.isArray(data.projects)) {
+        data.projects.forEach(proj => {
+          allProjects.push({
+            ...proj,
+            companyLogo: data.logo // Use company logo as fallback
+          });
+        });
+      }
+    });
+
+    // 1. Render Projects
+    projectList.innerHTML = "";
+    const uniqueCategories = new Set(["all"]); // Use lowercase for logic, but display original? Let's use lowercase for ID/matching.
+
+    allProjects.forEach(proj => {
+      const category = (proj.role || "project").toLowerCase();
+      uniqueCategories.add(category);
+
+      const li = document.createElement("li");
+      li.className = "project-item active"; // Default active
+      li.setAttribute("data-filter-item", "");
+      li.setAttribute("data-category", category);
+
+      // Image logic: proj.image -> companyLogo -> default placeholder
+      const imgSrc = proj.image || proj.companyLogo || "./assets/images/project-1.jpg";
+
+      li.innerHTML = `
+          <a href="#">
+            <figure class="project-img">
+              <div class="project-item-icon-box">
+                <ion-icon name="eye-outline"></ion-icon>
+              </div>
+              <img src="${imgSrc}" alt="${proj.name}" loading="lazy">
+            </figure>
+            <h3 class="project-title">${proj.name}</h3>
+            <p class="project-category">${proj.role || "Project"}</p>
+          </a>
+        `;
+
+      // Add Click Event for Modal
+      li.querySelector("a").addEventListener("click", (e) => {
+        e.preventDefault();
+
+        // Populate Modal
+        if (modalTitle) modalTitle.textContent = proj.name;
+        if (modalCategory) modalCategory.textContent = proj.role || "Project";
+        if (modalText) modalText.innerHTML = proj.desc ? `<p>${proj.desc}</p>` : "<p>No description available.</p>"; // Allow HTML in desc if needed, or textContent
+
+        if (modalImg && imgSrc) {
+          modalImg.src = imgSrc;
+          modalImg.alt = proj.name;
+          if (modalImgWrapper) modalImgWrapper.style.display = "block";
+        } else {
+          if (modalImgWrapper) modalImgWrapper.style.display = "none";
+        }
+
+        // Show Modal
+        if (modalContainer) modalContainer.classList.add("active");
+        if (modalOverlay) modalOverlay.classList.add("active");
+      });
+
+      projectList.appendChild(li);
+    });
+
+    // 2. Render Filters (Dynamic)
+    const filterList = document.querySelector(".filter-list");
+    const selectList = document.querySelector(".select-list");
+    const selectValue = document.querySelector("[data-selecct-value]");
+    const select = document.querySelector("[data-select]");
+
+    if (filterList && selectList) {
+      filterList.innerHTML = "";
+      selectList.innerHTML = "";
+
+      uniqueCategories.forEach(cat => {
+        const displayCat = cat.charAt(0).toUpperCase() + cat.slice(1); // Capitalize
+
+        // Desktop Filter Button
+        const filterItem = document.createElement("li");
+        filterItem.className = "filter-item";
+        const filterBtn = document.createElement("button");
+        filterBtn.innerText = displayCat === "All" ? "All" : displayCat; // "All" is already capitalized
+        filterBtn.setAttribute("data-filter-btn", "");
+        if (cat === "all") filterBtn.classList.add("active");
+
+        filterBtn.addEventListener("click", function () {
+          // Handle active class for buttons
+          const allBtns = document.querySelectorAll("[data-filter-btn]");
+          allBtns.forEach(btn => btn.classList.remove("active"));
+          this.classList.add("active");
+
+          // Filter
+          filterFunc(cat);
+        });
+
+        filterItem.appendChild(filterBtn);
+        filterList.appendChild(filterItem);
+
+        // Mobile Select Item
+        const selectItem = document.createElement("li");
+        selectItem.className = "select-item";
+        const selectBtn = document.createElement("button");
+        selectBtn.innerText = displayCat;
+        selectBtn.setAttribute("data-select-item", "");
+
+        selectBtn.addEventListener("click", function () {
+          if (selectValue) selectValue.innerText = this.innerText;
+          if (select) elementToggleFunc(select);
+          filterFunc(cat);
+        });
+
+        selectItem.appendChild(selectBtn);
+        selectList.appendChild(selectItem);
+      });
+    }
+
+  } catch (error) {
+    console.error("Error loading Portfolio:", error);
+  }
+}
+
 async function loadCompanies() {
   try {
     const clientsList = document.querySelector("[data-clients-list]");
@@ -592,7 +746,8 @@ async function initApp() {
     loadEducation(),
     loadSkills(),
     loadActivity(),
-    loadCompanies() // Added
+    loadCompanies(),
+    loadPortfolio() // Added
   ]);
 }
 
@@ -646,9 +801,8 @@ for (let i = 0; i < selectItems.length; i++) {
 }
 
 // filter variables
-const filterItems = document.querySelectorAll("[data-filter-item]");
-
 const filterFunc = function (selectedValue) {
+  const filterItems = document.querySelectorAll("[data-filter-item]"); // Dynamic query
   for (let i = 0; i < filterItems.length; i++) {
     if (selectedValue === "all") {
       filterItems[i].classList.add("active");
