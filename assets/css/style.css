@@ -1068,7 +1068,8 @@ main {
 }
 
 .project-item.active {
-  display: block;
+  display: flex;
+  flex-direction: column;
   animation: scaleUp 0.25s ease forwards;
 }
 
@@ -1084,6 +1085,9 @@ main {
 
 .project-item>a {
   width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 .project-img {
