@@ -656,13 +656,12 @@ main {
   grid-auto-columns: minmax(300px, 350px);
   gap: 15px;
   margin: 0 -15px;
-  padding: 25px;
-  padding-bottom: 35px;
+  padding: 25px 25px 35px 15px;
   overflow-x: auto;
   scroll-behavior: smooth;
   overscroll-behavior-inline: contain;
   scroll-snap-type: inline mandatory;
-  scroll-padding-inline: 25px;
+  scroll-padding-inline: 15px;
 }
 
 .testimonials-item {
@@ -835,13 +834,12 @@ main {
   align-items: flex-start;
   gap: 15px;
   margin: 0 -15px;
-  padding: 25px;
-  padding-bottom: 25px;
+  padding: 25px 25px 25px 15px;
   overflow-x: auto;
   scroll-behavior: smooth;
   overscroll-behavior-inline: contain;
   scroll-snap-type: inline mandatory;
-  scroll-padding-inline: 25px;
+  scroll-padding-inline: 15px;
 }
 
 .clients-item {
@@ -1699,8 +1697,9 @@ textarea.form-input::-webkit-resizer {
   .clients-list {
     gap: 50px;
     margin: 0 -30px;
-    padding: 45px;
-    scroll-padding-inline: 45px;
+    padding: 30px;
+    padding-bottom: 35px;
+    scroll-padding-inline: 30px;
   }
 
   .clients-item {
