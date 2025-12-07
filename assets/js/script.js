@@ -47,6 +47,29 @@ async function loadBio() {
       // Update About Text
       const aboutTextP = document.querySelector(".about-text p");
       if (aboutTextP) aboutTextP.textContent = bioData.aboutme;
+
+      // Update CV
+      const cvLink = document.querySelector("[data-contact-cv]");
+      if (cvLink) {
+        if (bioData.cv) {
+          cvLink.href = bioData.cv;
+          // Ensure it's visible (closest li)
+          cvLink.parentElement.parentElement.style.display = "flex";
+        } else {
+          // Hide if no CV
+          cvLink.parentElement.parentElement.style.display = "none";
+        }
+      }
+
+      // Update Typeform
+      const formContainer = document.querySelector("[data-typeform-container]");
+      if (formContainer && bioData.form) {
+        // Use embed URL, ensure it spans the container
+        formContainer.innerHTML = `<iframe id="typeform-full" width="100%" height="100%" frameborder="0" allow="camera; microphone; autoplay; encrypted-media;" src="${bioData.form}"></iframe>`;
+        // Optional: Import Typeform script if needed for advanced embedding, but iframe is safer for raw links
+      } else if (formContainer) {
+        formContainer.innerHTML = "<p style='padding: 20px;'>Contact form not configured.</p>";
+      }
     }
   } catch (error) {
     console.error("Error loading Bio:", error);
@@ -364,6 +387,201 @@ async function loadSkills() {
   }
 }
 
+async function loadActivity() {
+  try {
+    const activityList = document.querySelector("[data-activity-list]");
+    if (!activityList) return;
+
+    // Update Section Title
+    const titleElem = document.querySelector(".testimonials-title");
+    if (titleElem) titleElem.innerHTML = "Projects";
+
+    const contactsDocRef = doc(firestore, "contacts", "data");
+    const contactsSnap = await getDoc(contactsDocRef);
+    let githubUsername = "";
+
+    // Get GitHub username from Firestore
+    if (contactsSnap.exists()) {
+      const data = contactsSnap.data();
+      if (data.github) {
+        const urlPart = data.github.split("/").filter(Boolean);
+        githubUsername = urlPart[urlPart.length - 1];
+      }
+    }
+
+    const gitlabUsername = "dwiheruwaspodo"; // Explicitly requested
+    const allProjects = [];
+
+    // --- 1. Fetch GitHub Repos ---
+    if (githubUsername) {
+      try {
+        // Fetch sort by updated, 10 items
+        const ghRes = await fetch(`https://api.github.com/users/${githubUsername}/repos?sort=updated&per_page=10`);
+        if (ghRes.ok) {
+          const ghRepos = await ghRes.json();
+          ghRepos.forEach(repo => {
+            if (!repo.fork) { // Optional: Filter out forks if desired, or keep them. Let's keep them but maybe prefer sources.
+              allProjects.push({
+                source: "GitHub",
+                icon: "logo-github",
+                name: repo.name,
+                url: repo.html_url,
+                description: repo.description,
+                stars: repo.stargazers_count,
+                forks: repo.forks_count,
+                updatedAt: new Date(repo.updated_at),
+                language: repo.language // Main language
+              });
+            }
+          });
+        }
+      } catch (e) { console.error("GitHub repos fetch error", e); }
+    }
+
+    // --- 2. Fetch GitLab Repos ---
+    if (gitlabUsername) {
+      try {
+        const userRes = await fetch(`https://gitlab.com/api/v4/users?username=${gitlabUsername}`);
+        if (userRes.ok) {
+          const users = await userRes.json();
+          if (users.length > 0) {
+            const userId = users[0].id;
+            const glRes = await fetch(`https://gitlab.com/api/v4/users/${userId}/projects?order_by=last_activity_at&sort=desc&per_page=10&visibility=public`);
+            if (glRes.ok) {
+              const glRepos = await glRes.json();
+              glRepos.forEach(repo => {
+                allProjects.push({
+                  source: "GitLab",
+                  icon: "logo-gitlab",
+                  name: repo.name,
+                  url: repo.web_url,
+                  description: repo.description,
+                  stars: repo.star_count,
+                  forks: repo.forks_count,
+                  updatedAt: new Date(repo.last_activity_at),
+                  language: null // GitLab doesn't provide easily in summary
+                });
+              });
+            }
+          }
+        }
+      } catch (e) { console.error("GitLab repos fetch error", e); }
+    }
+
+    // --- 3. Merge, Sort & Render ---
+    activityList.innerHTML = "";
+
+    // Sort by Updated Date Descending
+    allProjects.sort((a, b) => b.updatedAt - a.updatedAt);
+
+    if (allProjects.length === 0) {
+      activityList.innerHTML = `<li class="testimonials-item"><p style="color:var(--light-gray); padding:20px;">No projects found.</p></li>`;
+      return;
+    }
+
+    allProjects.forEach(project => {
+      const dateStr = project.updatedAt.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+
+      const li = document.createElement("li");
+      li.className = "testimonials-item";
+
+      li.innerHTML = `
+          <div class="content-card" style="height: 100%; display: flex; flex-direction: column; justify-content: space-between; align-items: flex-start; min-width: 300px; padding: 20px;" data-testimonials-item>
+            
+            <div style="width: 100%;">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom: 10px;">
+                    <h4 class="h4 testimonials-item-title" style="font-size: 16px; font-weight: 600; margin:0; word-break:break-all; padding-right:10px;">
+                       <a href="${project.url}" target="_blank" style="color:var(--orange-yellow-crayola);">${project.name}</a>
+                    </h4>
+                    <ion-icon name="${project.icon}" style="font-size: 20px; color: var(--light-gray); flex-shrink:0;"></ion-icon>
+                </div>
+
+                <p class="testimonials-text" style="font-size: 14px; margin-bottom: 15px; line-height: 1.5; color: var(--light-gray);">
+                  ${project.description || "No description provided."}
+                </p>
+            </div>
+
+            <div style="display: flex; gap: 15px; align-items: center; font-size: 12px; color: var(--light-gray-70); width: 100%; margin-top: auto;">
+               <!-- Language (GitHub only mostly) -->
+               ${project.language ? `
+               <div style="display:flex; align-items:center; gap:4px;">
+                  <span style="width:8px; height:8px; border-radius:50%; background:var(--vegas-gold);"></span>
+                  <span>${project.language}</span>
+               </div>
+               ` : ''}
+
+               <!-- Stars -->
+               ${project.stars > 0 ? `
+               <div style="display:flex; align-items:center; gap:4px;">
+                  <ion-icon name="star-outline"></ion-icon>
+                  <span>${project.stars}</span>
+               </div>
+               ` : ''}
+
+               <!-- Updated -->
+               <div style="margin-left: auto;">
+                 ${dateStr}
+               </div>
+            </div>
+          </div>
+        `;
+      activityList.appendChild(li);
+    });
+
+  } catch (error) {
+    console.error("Error loading Projects:", error);
+  }
+}
+
+async function loadCompanies() {
+  try {
+    const clientsList = document.querySelector("[data-clients-list]");
+    if (!clientsList) return;
+
+    const worksSnap = await getDocs(collection(firestore, "works"));
+    const companies = [];
+    const seenCompanies = new Set();
+
+    worksSnap.forEach((doc) => {
+      const data = doc.data();
+      // Normalize company name to avoid duplicates
+      const companyName = data.company ? data.company.trim() : "";
+
+      if (data.logo && companyName && !seenCompanies.has(companyName)) {
+        companies.push(data);
+        seenCompanies.add(companyName);
+      }
+    });
+
+    if (companies.length === 0) {
+      // Optional: Hide section or show message? User just said "nampilin logo".
+      // Leave empty if no logos.
+      return;
+    }
+
+    clientsList.innerHTML = "";
+
+    companies.forEach(comp => {
+      const li = document.createElement("li");
+      li.className = "clients-item";
+
+      // Use company URL if available, else #
+      const linkUrl = comp.url || comp.website || "#";
+      const isClickable = linkUrl !== "#";
+
+      li.innerHTML = `
+          <a href="${linkUrl}" ${isClickable ? 'target="_blank"' : 'style="pointer-events: none; cursor: default;"'}>
+            <img src="${comp.logo}" alt="${comp.company} logo" style="max-height: 50px; width: auto; /* Ensure reasonable size */">
+          </a>
+        `;
+      clientsList.appendChild(li);
+    });
+
+  } catch (error) {
+    console.error("Error loading companies:", error);
+  }
+}
+
 // Master init function
 async function initApp() {
   await Promise.all([
@@ -372,7 +590,9 @@ async function initApp() {
     loadContacts(),
     loadExperience(),
     loadEducation(),
-    loadSkills(), // Added
+    loadSkills(),
+    loadActivity(),
+    loadCompanies() // Added
   ]);
 }
 
@@ -401,43 +621,7 @@ if (sidebarBtn) {
   });
 }
 
-// testimonials variables
-const testimonialsItem = document.querySelectorAll("[data-testimonials-item]");
-const modalContainer = document.querySelector("[data-modal-container]");
-const modalCloseBtn = document.querySelector("[data-modal-close-btn]");
-const overlay = document.querySelector("[data-overlay]");
 
-// modal variable
-const modalImg = document.querySelector("[data-modal-img]");
-const modalTitle = document.querySelector("[data-modal-title]");
-const modalText = document.querySelector("[data-modal-text]");
-
-// modal toggle function
-const testimonialsModalFunc = function () {
-  modalContainer.classList.toggle("active");
-  overlay.classList.toggle("active");
-};
-
-// add click event to all modal items
-for (let i = 0; i < testimonialsItem.length; i++) {
-  testimonialsItem[i].addEventListener("click", function () {
-    modalImg.src = this.querySelector("[data-testimonials-avatar]").src;
-    modalImg.alt = this.querySelector("[data-testimonials-avatar]").alt;
-    modalTitle.innerHTML = this.querySelector(
-      "[data-testimonials-title]",
-    ).innerHTML;
-    modalText.innerHTML = this.querySelector(
-      "[data-testimonials-text]",
-    ).innerHTML;
-
-    testimonialsModalFunc();
-  });
-}
-
-// add click event to modal close button
-if (modalCloseBtn)
-  modalCloseBtn.addEventListener("click", testimonialsModalFunc);
-if (overlay) overlay.addEventListener("click", testimonialsModalFunc);
 
 // custom select variables
 const select = document.querySelector("[data-select]");
