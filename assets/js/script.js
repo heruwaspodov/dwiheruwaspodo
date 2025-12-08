@@ -25,16 +25,18 @@ async function loadBio() {
     if (bioSnap.exists()) {
       const bioData = bioSnap.data();
 
-      // Update Name
+      // Update Name (only if data exists, preserve static content for SEO)
       const nameElem = document.querySelector(".name");
-      if (nameElem) {
+      if (nameElem && bioData.name) {
         nameElem.textContent = bioData.name;
         nameElem.title = bioData.name;
       }
 
-      // Update Role/Title
+      // Update Role/Title (only if data exists, preserve static content for SEO)
       const titleElem = document.querySelector(".title");
-      if (titleElem) titleElem.textContent = bioData.role;
+      if (titleElem && bioData.role) {
+        titleElem.textContent = bioData.role;
+      }
 
       // Update Location (Domicile + Country)
       const locationElem = document.querySelector("address");
@@ -44,9 +46,23 @@ async function loadBio() {
         locationElem.textContent = bioData.country;
       }
 
-      // Update About Text
-      const aboutTextP = document.querySelector(".about-text p");
-      if (aboutTextP) aboutTextP.textContent = bioData.aboutme;
+      // Update About Text (only replace if empty, preserve SEO content)
+      const aboutTextSection = document.querySelector(".about-text");
+      if (aboutTextSection && bioData.aboutme) {
+        const paragraphs = aboutTextSection.querySelectorAll("p");
+        // Check if all paragraphs are empty
+        const allEmpty = Array.from(paragraphs).every(p => !p.textContent.trim());
+        if (allEmpty && paragraphs.length > 0) {
+          // Replace first empty paragraph
+          paragraphs[0].textContent = bioData.aboutme;
+        } else if (allEmpty) {
+          // Create new paragraph if no paragraphs exist
+          const newP = document.createElement("p");
+          newP.textContent = bioData.aboutme;
+          aboutTextSection.appendChild(newP);
+        }
+        // If content exists (SEO content), don't replace it
+      }
 
       // Update CV
       const cvLink = document.querySelector("[data-contact-cv]");
