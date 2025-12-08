@@ -646,7 +646,7 @@ main {
 }
 
 .testimonials-title {
-  margin-bottom: 20px;
+  /* margin-bottom: 20px; */
 }
 
 .testimonials-list {
@@ -1622,7 +1622,7 @@ textarea.form-input::-webkit-resizer {
   /* testimonials */
 
   .testimonials-title {
-    margin-bottom: 25px;
+    /* margin-bottom: 25px; */
   }
 
   .testimonials-list {
