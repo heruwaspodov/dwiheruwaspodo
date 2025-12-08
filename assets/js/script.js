@@ -46,22 +46,18 @@ async function loadBio() {
         locationElem.textContent = bioData.country;
       }
 
-      // Update About Text (only replace if empty, preserve SEO content)
+      // Update About Text: overwrite first paragraph with Firestore bio (keep other SEO paragraphs)
       const aboutTextSection = document.querySelector(".about-text");
       if (aboutTextSection && bioData.aboutme) {
         const paragraphs = aboutTextSection.querySelectorAll("p");
-        // Check if all paragraphs are empty
-        const allEmpty = Array.from(paragraphs).every(p => !p.textContent.trim());
-        if (allEmpty && paragraphs.length > 0) {
-          // Replace first empty paragraph
+        if (paragraphs.length > 0) {
+          // Always override first paragraph with dynamic bio
           paragraphs[0].textContent = bioData.aboutme;
-        } else if (allEmpty) {
-          // Create new paragraph if no paragraphs exist
+        } else {
           const newP = document.createElement("p");
           newP.textContent = bioData.aboutme;
           aboutTextSection.appendChild(newP);
         }
-        // If content exists (SEO content), don't replace it
       }
 
       // Update CV
