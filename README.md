@@ -10,7 +10,7 @@ This is a dynamic, single-page portfolio website designed to be modern, responsi
 
 Key highlights include:
 - **Dynamic Content:** All major sections (Bio, Experience, Education, Projects, Skills, Contacts) are fetched dynamically from Firestore.
-- **Interactive Elements:** Includes a built-in Ruby Compiler (OneCompiler), Typeform integration, and expandable project details.
+- **Interactive Elements:** Includes a built-in Code Compiler (OneCompiler), Typeform integration, and expandable project details.
 - **SEO Optimized:** Fully integrated with Open Graph tags, Twitter Cards, and JSON-LD Schema for maximum discoverability.
 
 ## 🛠 Tech Stack
@@ -33,8 +33,8 @@ Built with modern web technologies for performance and scalability:
 1.  **Dynamic Portfolio Grid:**
     - Projects are fetched from the `works` collection in Firestore.
     - Includes logic to filter by category (Role) and display details in a modal popup.
-2.  **Integrated Ruby Compiler:**
-    - A dedicated section for showcasing or testing Ruby code directly within the browser using OneCompiler embed.
+2.  **Integrated Code Compiler:**
+    - A dedicated section for showcasing or testing code directly within the browser using OneCompiler embed.
 3.  **Real-time Data:**
     - Updates to your bio, job history, or contact info in Firestore reflect immediately on the site.
 4.  **Responsive Design:**
