@@ -1,6 +1,6 @@
 const upcomingTools = [
   ["JWT Inspector", "Decode token headers and payloads locally."],
-  ["UUID Generator", "Generate UUID values in the browser."],
+  ["Key Pair Validator", "Verify that a private key and public key belong to the same cryptographic pair."],
   ["Regex Playground", "Test patterns and capture groups locally."],
   ["Color Converter", "Translate HEX, RGB, and HSL color values."],
 ];

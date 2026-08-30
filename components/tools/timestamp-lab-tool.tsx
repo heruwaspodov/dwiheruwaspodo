@@ -79,10 +79,13 @@ function formatInZone(date: Date, timeZone: string) {
 export function TimestampLabTool() {
   const [timestamp, setTimestamp] = useState("1788066030");
   const [timestampZone, setTimestampZone] = useState("Asia/Jakarta");
+  const [dateTimestamp, setDateTimestamp] = useState("2026-08-30T12:00:30");
+  const [dateTimestampZone, setDateTimestampZone] = useState("Asia/Jakarta");
   const [dateTime, setDateTime] = useState("2026-08-30T12:00:30");
   const [fromZone, setFromZone] = useState("Asia/Jakarta");
   const [toZone, setToZone] = useState("Europe/London");
   const [timestampResult, setTimestampResult] = useState("");
+  const [dateTimestampResult, setDateTimestampResult] = useState("");
   const [zoneResult, setZoneResult] = useState("");
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
@@ -111,6 +114,18 @@ export function TimestampLabTool() {
     }
   };
 
+  const convertDateToTimestamp = () => {
+    try {
+      const date = zonedDateTimeToDate(dateTimestamp, dateTimestampZone);
+      setDateTimestampResult([`INPUT: ${formatInZone(date, dateTimestampZone)}`, `TIMEZONE: ${dateTimestampZone}`, `UNIX SECONDS: ${Math.trunc(date.getTime() / 1000)}`, `UNIX MILLISECONDS: ${date.getTime()}`, `UTC / ISO: ${date.toISOString()}`].join("\n"));
+      setMessage(`DATE IN ${dateTimestampZone} · CONVERTED TO UNIX TIMESTAMP`);
+      setError("");
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : "Unable to convert this date to a timestamp.");
+      setMessage("");
+    }
+  };
+
   return (
     <>
       <h2>Timestamp Lab</h2>
@@ -121,6 +136,12 @@ export function TimestampLabTool() {
           <div className="timestamp-inputs"><label className="field-label">TIMESTAMP<input className="tool-input" inputMode="numeric" value={timestamp} onChange={(event) => setTimestamp(event.target.value)} /></label><label className="field-label">DISPLAY TIMEZONE<select className="tool-input" value={timestampZone} onChange={(event) => setTimestampZone(event.target.value)}>{timeZones.map((zone) => <option key={zone}>{zone}</option>)}</select></label></div>
           <div className="tool-actions"><button type="button" onClick={convertTimestamp}>CONVERT TIMESTAMP</button><button type="button" onClick={() => setTimestamp(String(Math.trunc(Date.now() / 1000)))}>USE CURRENT TIME</button></div>
           {timestampResult && <pre className="timestamp-output">{timestampResult}</pre>}
+        </section>
+        <section className="timestamp-section" aria-labelledby="date-timestamp-heading">
+          <h3 id="date-timestamp-heading">DATE → UNIX TIMESTAMP</h3>
+          <div className="timestamp-inputs"><label className="field-label">DATE & TIME<input className="tool-input" type="datetime-local" step="1" value={dateTimestamp} onChange={(event) => setDateTimestamp(event.target.value)} /></label><label className="field-label">INPUT TIMEZONE<select className="tool-input" value={dateTimestampZone} onChange={(event) => setDateTimestampZone(event.target.value)}>{timeZones.map((zone) => <option key={zone}>{zone}</option>)}</select></label></div>
+          <div className="tool-actions"><button type="button" onClick={convertDateToTimestamp}>CONVERT DATE</button><button type="button" onClick={() => setDateTimestamp(dateTimeInputValue(new Date(), dateTimestampZone))}>USE CURRENT TIME</button></div>
+          {dateTimestampResult && <pre className="timestamp-output">{dateTimestampResult}</pre>}
         </section>
         <section className="timestamp-section" aria-labelledby="timezone-heading">
           <h3 id="timezone-heading">TIMEZONE → TIMEZONE</h3>

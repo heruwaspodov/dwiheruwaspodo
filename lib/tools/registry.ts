@@ -42,6 +42,13 @@ export const toolDefinitions = [
     accent: "yellow",
   },
   {
+    slug: "uuid-generator",
+    label: "UUID Generator",
+    title: "Secure UUID v4 Generator",
+    description: "Generate one or many cryptographically random UUID v4 values locally with the browser Web Crypto API.",
+    accent: "green",
+  },
+  {
     slug: "ruby-compiler",
     label: "Ruby Compiler",
     title: "Online Ruby Compiler",

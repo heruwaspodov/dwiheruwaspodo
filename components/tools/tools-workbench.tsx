@@ -7,6 +7,7 @@ import { TextDiffTool } from "@/components/tools/text-diff-tool";
 import { TimestampLabTool } from "@/components/tools/timestamp-lab-tool";
 import { UpcomingTool } from "@/components/tools/upcoming-tool";
 import { UrlTool } from "@/components/tools/url-tool";
+import { UuidGeneratorTool } from "@/components/tools/uuid-generator-tool";
 import { toolDefinitions, type ToolSlug } from "@/lib/tools/registry";
 
 function ActiveTool({ slug }: { slug: ToolSlug }) {
@@ -16,6 +17,7 @@ function ActiveTool({ slug }: { slug: ToolSlug }) {
   if (slug === "json-beautifier") return <JsonBeautifierTool />;
   if (slug === "text-diff") return <TextDiffTool />;
   if (slug === "timestamp-lab") return <TimestampLabTool />;
+  if (slug === "uuid-generator") return <UuidGeneratorTool />;
   if (slug === "ruby-compiler") return <RubyCompilerTool />;
   return <UpcomingTool />;
 }
