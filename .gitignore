@@ -6,6 +6,12 @@ node_modules/
 
 # Build output
 dist/
+build/
+out/
+.next/
+
+# TypeScript
+*.tsbuildinfo
 
 # System files
 .DS_Store
