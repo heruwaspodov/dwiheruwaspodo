@@ -6,11 +6,11 @@ Welcome to the personal portfolio repository of Dwi Heru Budi Waspodo. This proj
 
 ## 📌 Overview
 
-This is a dynamic, single-page portfolio website designed to be modern, responsive, and easy to manage. Unlike traditional static portfolios, the content here allows direct management through **Google Cloud Firestore**, enabling real-time updates without redeploying the code.
+This is a multi-route, SEO-friendly portfolio built with Next.js and exported to Firebase Hosting. Content remains managed through **Google Cloud Firestore**, and the browser refreshes the build-time snapshot after hydration.
 
 Key highlights include:
 - **Dynamic Content:** All major sections (Bio, Experience, Education, Projects, Skills, Contacts) are fetched dynamically from Firestore.
-- **Interactive Elements:** Includes a built-in Code Compiler (OneCompiler), Typeform integration, and expandable project details.
+- **Interactive Elements:** Includes portfolio filters, project detail routes, a developer utility belt, a lazy-loaded Typeform contact form, and a low-poly 3D CRT hero.
 - **SEO Optimized:** Fully integrated with Open Graph tags, Twitter Cards, and JSON-LD Schema for maximum discoverability.
 
 ## 🛠 Tech Stack
@@ -18,27 +18,29 @@ Key highlights include:
 Built with modern web technologies for performance and scalability:
 
 - **Frontend:**
-  - **HTML5 & Vanilla CSS3:** For semantic structure and custom, high-performance styling.
-  - **JavaScript (ES6+):** For logic, DOM manipulation, and API interactions.
-  - **Vite:** Next-generation frontend tooling for fast builds and development.
+  - **Next.js App Router + TypeScript:** Static route generation, metadata, and client navigation.
+  - **React Three Fiber:** Low-poly CRT landing experience with a semantic fallback.
+  - **Custom CSS:** Oldish neobrutalist visual system with responsive layouts and reduced-motion support.
 
 - **Backend / Infrastructure:**
   - **Google Firebase:**
     - **Firestore:** NoSQL database for flexible content management.
-    - **Hosting:** Fast and secure global hosting.
+    - **Hosting:** Serves the exported Next.js routes.
+  - **Cloudflare R2:** Stores versioned CV PDFs only; the current public URL remains in Firestore.
   - **GitLab & GitHub:** Code repository and version control.
 
 ## 🚀 Features
 
 1.  **Dynamic Portfolio Grid:**
     - Projects are fetched from the `works` collection in Firestore.
-    - Includes logic to filter by category (Role) and display details in a modal popup.
-2.  **Integrated Code Compiler:**
-    - A dedicated section for showcasing or testing code directly within the browser using OneCompiler embed.
+    - Includes category filters and a crawlable detail page for every project.
+2.  **Developer Utility Belt:**
+    - Ruby Hash ↔ JSON, Image ↔ Base64, and URL encode/decode tools run locally in the browser.
+    - The tool registry is prepared for additional daily utilities.
 3.  **Real-time Data:**
-    - Updates to your bio, job history, or contact info in Firestore reflect immediately on the site.
+    - Firestore is captured during the production build for crawlable HTML, then refreshed in the browser after hydration.
 4.  **Responsive Design:**
-    - Optimized for all devices, from mobile phones to large desktop screens, with a custom sidebar navigation system.
+    - Desktop and mobile share the same content and identity, with layout and navigation adapted to the available space.
 
 ## 📝 Content Management (Firestore)
 
@@ -74,10 +76,25 @@ Build for production:
 npm run build
 ```
 
+Preview the static export:
+```bash
+npm start
+```
+
 Deploy to Firebase:
 ```bash
 npm run deploy
 ```
+
+## CV storage workflow
+
+1. Upload a versioned PDF to the Cloudflare R2 bucket, for example `documents/cv/dwi-heru-cv-2026-08.pdf`.
+2. Use a production custom domain for the public R2 URL; do not use `r2.dev` in production.
+3. Verify the PDF response and filename.
+4. Update `bio/data.cv` in Firestore with the new public URL.
+5. Keep the previous object and Firestore value available until production verification passes.
+
+No R2 write credential belongs in this repository or in browser code.
 
 ---
 *Created by [Dwi Heru Budi Waspodo](https://www.linkedin.com/in/dwiheruwaspodo/).*

@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#f3eddd"/>
+  <path d="M0 0h1200v630H0z" fill="url(#grid)" opacity=".28"/>
+  <defs><pattern id="grid" width="30" height="30" patternUnits="userSpaceOnUse"><path d="M30 0H0v30" fill="none" stroke="#171713" stroke-width="1"/></pattern></defs>
+  <path d="M784 71l57 117 124-43-56 112 121 50-119 37 45 120-112-61-62 108-22-126-128 18 89-91-91-89 129 14z" fill="#ffd84a" stroke="#171713" stroke-width="8"/>
+  <rect x="68" y="68" width="155" height="48" fill="#5bb7e8" stroke="#171713" stroke-width="6"/>
+  <text x="86" y="101" font-family="monospace" font-size="20" font-weight="700" fill="#171713">PLAYER_01</text>
+  <text x="65" y="305" font-family="Arial Black,Arial,sans-serif" font-size="156" font-weight="900" letter-spacing="-10" fill="#171713">DWI HERU</text>
+  <rect x="69" y="353" width="526" height="64" fill="#ef3f38" stroke="#171713" stroke-width="6"/>
+  <text x="91" y="395" font-family="Arial Black,Arial,sans-serif" font-size="28" fill="#fff9ea">SOFTWARE ENGINEER / TECH LEAD</text>
+  <rect x="769" y="151" width="344" height="275" rx="12" fill="#d3c29d" stroke="#171713" stroke-width="9"/>
+  <rect x="804" y="187" width="274" height="188" rx="32" fill="#142018" stroke="#171713" stroke-width="8"/>
+  <circle cx="875" cy="278" r="61" fill="#c49a74"/>
+  <circle cx="1008" cy="278" r="61" fill="#ef3f38"/>
+  <path d="M974 248l34-19 34 19-10 51-24 27-24-27z" fill="#171713"/>
+  <path d="M989 265l17 7-12 15zM1027 265l-17 7 12 15z" fill="#fff9ea"/>
+  <rect x="881" y="426" width="119" height="63" fill="#bea984" stroke="#171713" stroke-width="8"/>
+  <rect x="805" y="482" width="272" height="44" fill="#c9b58e" stroke="#171713" stroke-width="8"/>
+  <text x="70" y="554" font-family="monospace" font-size="24" font-weight="700" fill="#171713">BACKEND ENGINEER BY TRADE. TECH LEAD BY EXPERIENCE.</text>
+</svg>

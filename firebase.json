@@ -1,13 +1,9 @@
 {
   "hosting": {
-    "public": "build",
+    "public": "out",
     "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
-    "rewrites": [
-      {
-        "source": "**",
-        "destination": "/index.html"
-      }
-    ],
+    "cleanUrls": true,
+    "trailingSlash": true,
     "headers": [
       {
         "source": "/robots.txt",
@@ -24,6 +20,15 @@
           {
             "key": "Content-Type",
             "value": "application/xml"
+          }
+        ]
+      },
+      {
+        "source": "**/*.html",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "public, max-age=0, must-revalidate"
           }
         ]
       },
