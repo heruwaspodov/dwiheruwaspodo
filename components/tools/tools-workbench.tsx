@@ -1,15 +1,49 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import Link from "next/link";
+import { useState } from "react";
+import { toolDefinitions, type ToolSlug } from "@/lib/tools/registry";
 
-type ToolId = "ruby-json" | "base64" | "url" | "upcoming";
+const RUBY_WASM_VERSION = "2.10.1";
+const RUBY_RUNTIME_URL = `https://cdn.jsdelivr.net/npm/@ruby/4.0-wasm-wasi@${RUBY_WASM_VERSION}/dist/ruby+stdlib.wasm`;
+const RUBY_BRIDGE_URL = `https://cdn.jsdelivr.net/npm/@ruby/wasm-wasi@${RUBY_WASM_VERSION}/dist/browser.umd.js`;
 
-const tools: Array<{ id: ToolId; label: string }> = [
-  { id: "ruby-json", label: "Ruby Hash ↔ JSON" },
-  { id: "base64", label: "Image ↔ Base64" },
-  { id: "url", label: "URL Encode / Decode" },
-  { id: "upcoming", label: "Upcoming Tools" },
-];
+type RubyValue = { toString(): string };
+type RubyVm = { eval(source: string): RubyValue };
+type RubyBridge = { DefaultRubyVM(module: WebAssembly.Module): Promise<{ vm: RubyVm }> };
+
+let rubyVmPromise: Promise<RubyVm> | null = null;
+
+function loadScript(src: string) {
+  return new Promise<void>((resolve, reject) => {
+    const existing = document.querySelector<HTMLScriptElement>(`script[src="${src}"]`);
+    if (existing?.dataset.loaded === "true") return resolve();
+    const script = existing ?? document.createElement("script");
+    script.src = src;
+    script.async = true;
+    script.addEventListener("load", () => {
+      script.dataset.loaded = "true";
+      resolve();
+    }, { once: true });
+    script.addEventListener("error", () => reject(new Error("Unable to load the Ruby WebAssembly bridge.")), { once: true });
+    if (!existing) document.head.appendChild(script);
+  });
+}
+
+async function getRubyVm() {
+  if (!rubyVmPromise) {
+    rubyVmPromise = (async () => {
+      await loadScript(RUBY_BRIDGE_URL);
+      const bridge = (window as Window & { "ruby-wasm-wasi"?: RubyBridge })["ruby-wasm-wasi"];
+      if (!bridge) throw new Error("Ruby WebAssembly bridge is unavailable.");
+      const response = await fetch(RUBY_RUNTIME_URL);
+      if (!response.ok) throw new Error("Unable to download the Ruby runtime.");
+      const wasmModule = await WebAssembly.compile(await response.arrayBuffer());
+      return (await bridge.DefaultRubyVM(wasmModule)).vm;
+    })();
+  }
+  return rubyVmPromise;
+}
 
 function rubyHashToJson(source: string) {
   const normalized = source
@@ -72,10 +106,7 @@ function Base64Tool() {
 
   const onFile = (file?: File) => {
     if (!file) return;
-    if (!file.type.startsWith("image/")) {
-      setError("Please select an image file.");
-      return;
-    }
+    if (!file.type.startsWith("image/")) return setError("Please select an image file.");
     const reader = new FileReader();
     reader.onload = () => {
       const result = String(reader.result ?? "");
@@ -90,8 +121,7 @@ function Base64Tool() {
   const decode = () => {
     const candidate = value.trim();
     if (!candidate) return;
-    const dataUrl = candidate.startsWith("data:image/") ? candidate : `data:image/png;base64,${candidate}`;
-    setPreview(dataUrl);
+    setPreview(candidate.startsWith("data:image/") ? candidate : `data:image/png;base64,${candidate}`);
     setError("");
   };
 
@@ -100,10 +130,9 @@ function Base64Tool() {
       <h2>Image ↔ Base64</h2>
       <p>Encode an image into a data URL or preview an existing Base64 image value. Processing stays in your browser.</p>
       <label className="field-label">IMAGE FILE<input className="tool-input" type="file" accept="image/*" onChange={(event) => onFile(event.target.files?.[0])} /></label>
-      <label className="field-label" style={{ marginTop: 15 }}>BASE64 / DATA URL<textarea className="tool-textarea" value={value} onChange={(event) => setValue(event.target.value)} spellCheck={false} /></label>
+      <label className="field-label tool-field-spaced">BASE64 / DATA URL<textarea className="tool-textarea" value={value} onChange={(event) => setValue(event.target.value)} spellCheck={false} /></label>
       <div className="tool-actions"><button type="button" onClick={decode}>PREVIEW BASE64</button><button type="button" onClick={() => navigator.clipboard.writeText(value)} disabled={!value}>COPY VALUE</button></div>
       {error && <p className="tool-error" role="alert">ERROR: {error}</p>}
-      {/* Base64 previews are user-provided local data URLs with unknown dimensions. */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       {preview && <img className="image-preview" src={preview} alt="Decoded Base64 preview" onError={() => setError("Invalid image Base64 value.")} />}
     </>
@@ -138,38 +167,84 @@ function UrlTool() {
   );
 }
 
+function RubyCompilerTool() {
+  const [source, setSource] = useState('name = "Dwi"\n3.times { |index| puts "#{index + 1}. Hello, #{name}!" }');
+  const [output, setOutput] = useState("Ruby runtime loads when you press RUN.");
+  const [status, setStatus] = useState<"idle" | "loading" | "running">("idle");
+
+  const run = async () => {
+    try {
+      setStatus("loading");
+      setOutput("Loading CRuby WebAssembly runtime…");
+      const vm = await getRubyVm();
+      setStatus("running");
+      const wrapped = `
+require "stringio"
+__portfolio_output__ = StringIO.new
+__portfolio_stdout__ = $stdout
+__portfolio_stderr__ = $stderr
+$stdout = __portfolio_output__
+$stderr = __portfolio_output__
+begin
+${source}
+rescue Exception => error
+  warn "#{error.class}: #{error.message}"
+  warn error.backtrace.first(8).join("\\n")
+ensure
+  $stdout = __portfolio_stdout__
+  $stderr = __portfolio_stderr__
+end
+__portfolio_output__.string
+`;
+      setOutput(vm.eval(wrapped).toString() || "(program completed without output)");
+    } catch (caught) {
+      setOutput(caught instanceof Error ? `${caught.name}: ${caught.message}` : "Ruby execution failed.");
+    } finally {
+      setStatus("idle");
+    }
+  };
+
+  return (
+    <>
+      <h2>Ruby Compiler</h2>
+      <p>Run CRuby 4.0 locally through WebAssembly. Networking, native gems, and threads are intentionally unavailable.</p>
+      <div className="tool-fields compiler-fields">
+        <label className="field-label">RUBY CODE<textarea className="tool-textarea code-editor" value={source} onChange={(event) => setSource(event.target.value)} spellCheck={false} /></label>
+        <label className="field-label">PROGRAM OUTPUT<textarea className="tool-textarea terminal-output" value={output} readOnly spellCheck={false} /></label>
+      </div>
+      <div className="tool-actions"><button type="button" onClick={run} disabled={status !== "idle"}>{status === "loading" ? "LOADING RUBY…" : status === "running" ? "RUNNING…" : "RUN RUBY"}</button><button type="button" onClick={() => setSource("")}>CLEAR CODE</button><button type="button" onClick={() => navigator.clipboard.writeText(output)}>COPY OUTPUT</button></div>
+      <p className="runtime-note">RUNTIME: CRUBY 4.0 / WASM · EXECUTION: LOCAL_BROWSER</p>
+    </>
+  );
+}
+
 function UpcomingTool() {
   return (
     <>
       <h2>Upcoming Tools</h2>
-      <p>The workbench is registry-based, so new daily utilities can be added without changing the main navigation.</p>
+      <p>These utilities already have a reserved place in the workbench and can become dedicated pages when needed.</p>
       <div className="service-grid">
-        {[
-          ["JWT Inspector", "Decode token headers and payloads locally."],
-          ["JSON Formatter", "Validate, format, and minify JSON."],
-          ["Timestamp Lab", "Convert Unix timestamps and time zones."],
-          ["UUID Generator", "Generate UUID values in the browser."],
-        ].map(([name, description], index) => <article className="brutal-card service-card" key={name}><span>0{index + 1}.</span><h3>{name}</h3><p>{description}</p></article>)}
+        {[["JWT Inspector", "Decode token headers and payloads locally."], ["JSON Formatter", "Validate, format, and minify JSON."], ["Timestamp Lab", "Convert Unix timestamps and time zones."], ["UUID Generator", "Generate UUID values in the browser."]].map(([name, description], index) => <article className="brutal-card service-card" key={name}><span>0{index + 1}.</span><h3>{name}</h3><p>{description}</p></article>)}
       </div>
     </>
   );
 }
 
-export function ToolsWorkbench() {
-  const [active, setActive] = useState<ToolId>("ruby-json");
-  const activePanel = useMemo(() => {
-    if (active === "ruby-json") return <RubyJsonTool />;
-    if (active === "base64") return <Base64Tool />;
-    if (active === "url") return <UrlTool />;
-    return <UpcomingTool />;
-  }, [active]);
+function ActiveTool({ slug }: { slug: ToolSlug }) {
+  if (slug === "ruby-hash-to-json") return <RubyJsonTool />;
+  if (slug === "image-to-base64") return <Base64Tool />;
+  if (slug === "url-encode-decode") return <UrlTool />;
+  if (slug === "ruby-compiler") return <RubyCompilerTool />;
+  return <UpcomingTool />;
+}
 
+export function ToolsWorkbench({ active }: { active: ToolSlug }) {
   return (
     <section className="tools-layout shell">
-      <div className="tool-menu" role="tablist" aria-label="Developer tools">
-        {tools.map((tool) => <button key={tool.id} type="button" role="tab" aria-selected={active === tool.id} onClick={() => setActive(tool.id)}>{tool.label}</button>)}
-      </div>
-      <div className="brutal-card tool-panel" role="tabpanel">{activePanel}</div>
+      <nav className="tool-menu" aria-label="Developer tools">
+        {toolDefinitions.map((tool) => <Link key={tool.slug} href={`/tools/${tool.slug}/`} aria-current={active === tool.slug ? "page" : undefined}>{tool.label}</Link>)}
+      </nav>
+      <div className="brutal-card tool-panel"><ActiveTool slug={active} /></div>
     </section>
   );
 }

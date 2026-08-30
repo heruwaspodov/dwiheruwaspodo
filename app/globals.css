@@ -17,6 +17,9 @@
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
 body {
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
   margin: 0;
   color: var(--ink);
   background-color: var(--paper);
@@ -25,6 +28,7 @@ body {
   font-family: var(--body);
   line-height: 1.5;
 }
+main { flex: 1; }
 body::selection { color: var(--ink); background: var(--yellow); }
 a { color: inherit; }
 button, input, textarea, select { font: inherit; }
@@ -161,20 +165,38 @@ img { max-width: 100%; }
 
 .tools-layout { display: grid; grid-template-columns: 260px minmax(0, 1fr); gap: 23px; padding-bottom: 76px; }
 .tool-menu { display: grid; align-content: start; gap: 9px; }
-.tool-menu button { min-height: 48px; padding: 10px 13px; text-align: left; background: var(--cream); border: var(--line); cursor: pointer; font-family: var(--mono); font-size: 11px; font-weight: 900; }
-.tool-menu button[aria-selected="true"] { background: var(--yellow); box-shadow: 4px 4px 0 var(--ink); }
+.tool-menu a { min-height: 48px; display: flex; align-items: center; padding: 10px 13px; color: var(--ink); text-align: left; text-decoration: none; background: var(--cream); border: var(--line); font-family: var(--mono); font-size: 11px; font-weight: 900; }
+.tool-menu a:hover, .tool-menu a[aria-current="page"] { background: var(--yellow); box-shadow: 4px 4px 0 var(--ink); }
 .tool-panel { min-width: 0; padding: 25px; }
 .tool-panel h2 { margin: 0 0 5px; font-family: var(--display); font-size: 30px; text-transform: uppercase; }
 .tool-panel > p { margin: 0 0 22px; color: var(--muted); font-family: var(--mono); font-size: 11px; }
 .tool-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
 .field-label { display: grid; gap: 7px; font-family: var(--mono); font-size: 10px; font-weight: 900; }
+.tool-field-spaced { margin-top: 15px; }
 .tool-textarea, .tool-input { width: 100%; color: var(--ink); background: var(--paper); border: var(--line); border-radius: 0; }
 .tool-textarea { min-height: 245px; padding: 13px; resize: vertical; font-family: var(--mono); font-size: 13px; line-height: 1.5; }
 .tool-input { min-height: 47px; padding: 9px 12px; }
 .tool-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
 .tool-actions button { min-height: 43px; padding: 8px 13px; background: var(--yellow); border: var(--line); box-shadow: 3px 3px 0 var(--ink); cursor: pointer; font-family: var(--mono); font-size: 10px; font-weight: 900; }
 .tool-error { margin-top: 12px; color: #a20f0b; font-family: var(--mono); font-size: 11px; font-weight: 900; }
+.terminal-output { color: #d8e8d0; background: #10120f; }
+.runtime-note { margin: 18px 0 0 !important; color: var(--muted); font-family: var(--mono); font-size: 9px !important; font-weight: 900; }
 .image-preview { max-height: 320px; margin-top: 15px; object-fit: contain; border: var(--line); background-image: linear-gradient(45deg,#ccc 25%,transparent 25%),linear-gradient(-45deg,#ccc 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#ccc 75%),linear-gradient(-45deg,transparent 75%,#ccc 75%); background-size: 20px 20px; background-position: 0 0,0 10px,10px -10px,-10px 0; }
+
+.tool-catalog { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; padding-bottom: 76px; }
+.tool-catalog-card { min-height: 260px; display: flex; flex-direction: column; padding: 24px; color: var(--ink); text-decoration: none; transition: transform .15s, box-shadow .15s; }
+.tool-catalog-card:hover { transform: translate(-3px, -3px); box-shadow: 11px 11px 0 var(--ink); }
+.tool-catalog-card > span { font-family: var(--mono); font-size: 10px; font-weight: 900; }
+.tool-catalog-card h2 { max-width: 540px; margin: 40px 0 10px; font-family: var(--display); font-size: clamp(25px, 4vw, 38px); line-height: 1; text-transform: uppercase; }
+.tool-catalog-card p { max-width: 590px; margin: 0; font-family: var(--mono); font-size: 11px; font-weight: 700; line-height: 1.65; }
+.tool-catalog-card strong { margin-top: auto; padding-top: 26px; font-family: var(--mono); font-size: 11px; }
+.accent-blue { background: var(--blue); }
+.accent-yellow { background: var(--yellow); }
+.accent-red { color: var(--cream); background: var(--red); }
+.accent-green { background: var(--green); }
+.accent-cream { background: var(--cream); }
+.tool-page-hero { padding-bottom: 34px; }
+.tool-page-hero .section-heading h1 { max-width: 1000px; font-size: clamp(40px, 6vw, 70px); }
 
 .contact-layout { display: grid; grid-template-columns: .72fr 1.28fr; gap: 22px; padding-bottom: 76px; }
 .contact-card { padding: 25px; }
@@ -216,14 +238,14 @@ img { max-width: 100%; }
   .hero { grid-template-columns: 1fr; min-height: 0; gap: 12px; padding-block: 36px 62px; }
   .hero-copy { display: contents; }
   .eyebrow { grid-row: 1; justify-self: start; margin: 0; }
-  .hero h1 { grid-row: 2; font-size: clamp(65px, 22vw, 105px); }
+  .hero h1 { grid-row: 2; max-width: 100%; padding-block: 6px 12px; font-size: clamp(64px, 20vw, 94px); line-height: .9; letter-spacing: -.055em; }
   .crt-stage { grid-row: 3; min-height: 400px; margin: -12px 0 -4px; }
   .crt-stage canvas { height: 400px !important; }
   .role-stamp { grid-row: 4; justify-self: start; margin: 0; }
   .hero-intro { grid-row: 5; font-size: 13px; }
   .hero .brutal-button { grid-row: 6; justify-self: start; }
   .section { padding-block: 57px; }
-  .service-grid, .portfolio-grid, .company-grid, .project-detail, .contact-layout, .tools-layout { grid-template-columns: 1fr; }
+  .service-grid, .portfolio-grid, .company-grid, .project-detail, .contact-layout, .tools-layout, .tool-catalog { grid-template-columns: 1fr; }
   .terminal-body { grid-template-columns: 1fr; padding: 20px; }
   .career-log { padding: 20px 0 0; border-top: 2px solid #536054; border-left: 0; }
   .career-commit { padding-left: 18px; }
@@ -239,12 +261,13 @@ img { max-width: 100%; }
   .tools-layout { gap: 16px; }
   .tool-menu { grid-template-columns: repeat(2, 1fr); }
   .tool-fields { grid-template-columns: 1fr; }
+  .tool-catalog-card { min-height: 230px; }
   .map-panel { min-height: 340px; }
 }
 
 @media (max-width: 410px) {
   .brand-copy { display: none; }
-  .hero h1 { font-size: 62px; }
+  .hero h1 { font-size: clamp(58px, 19vw, 70px); line-height: .92; }
   .crt-stage { min-height: 330px; }
   .crt-stage canvas { height: 330px !important; }
   .service-grid, .company-grid, .tool-menu { grid-template-columns: 1fr; }

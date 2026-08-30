@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <rect x="22" y="22" width="92" height="92" fill="#171713"/>
+  <g transform="rotate(-4 62 60)">
+    <rect x="14" y="14" width="92" height="92" rx="2" fill="#ef3f38" stroke="#171713" stroke-width="8"/>
+    <text x="60" y="78" fill="#fff9ea" font-family="Arial Black, Impact, sans-serif" font-size="48" font-weight="900" text-anchor="middle" letter-spacing="-4">DH</text>
+  </g>
+</svg>

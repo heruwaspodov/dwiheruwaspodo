@@ -16,6 +16,10 @@ export const metadata: Metadata = {
   applicationName: "Dwi Heru Portfolio",
   authors: [{ name: "Dwi Heru Budi Waspodo", url: siteUrl }],
   creator: "Dwi Heru Budi Waspodo",
+  icons: {
+    icon: [{ url: "/favicon.svg", type: "image/svg+xml" }, { url: "/favicon.ico", sizes: "256x256" }],
+    shortcut: "/favicon.ico",
+  },
   alternates: { canonical: "/" },
   openGraph: {
     type: "website",
