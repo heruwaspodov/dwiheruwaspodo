@@ -4,16 +4,16 @@ import { toolDefinitions } from "@/lib/tools/registry";
 
 export const metadata: Metadata = {
   title: "Developer Tools",
-  description: "A catalog of developer utilities for Ruby, JSON, file-to-Base64 conversion, URL encoding, and everyday workflows.",
+  description: "A catalog of developer utilities for Ruby, JSON, Base64 files, text comparison, Unix timestamps, timezones, and everyday workflows.",
   alternates: { canonical: "/tools/" },
   openGraph: {
     title: "Developer Tools | Dwi Heru",
-    description: "A catalog of developer utilities for Ruby, JSON, file-to-Base64 conversion, URL encoding, and everyday workflows.",
+    description: "A catalog of developer utilities for Ruby, JSON, Base64 files, text comparison, Unix timestamps, timezones, and everyday workflows.",
     url: "/tools/",
   },
   twitter: {
     title: "Developer Tools | Dwi Heru",
-    description: "A catalog of developer utilities for Ruby, JSON, file-to-Base64 conversion, URL encoding, and everyday workflows.",
+    description: "A catalog of developer utilities for Ruby, JSON, Base64 files, text comparison, Unix timestamps, timezones, and everyday workflows.",
   },
 };
 

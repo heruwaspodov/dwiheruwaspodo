@@ -3,6 +3,8 @@ import { FileBase64Tool } from "@/components/tools/file-base64-tool";
 import { JsonBeautifierTool } from "@/components/tools/json-beautifier-tool";
 import { RubyCompilerTool } from "@/components/tools/ruby-compiler-tool";
 import { RubyJsonTool } from "@/components/tools/ruby-json-tool";
+import { TextDiffTool } from "@/components/tools/text-diff-tool";
+import { TimestampLabTool } from "@/components/tools/timestamp-lab-tool";
 import { UpcomingTool } from "@/components/tools/upcoming-tool";
 import { UrlTool } from "@/components/tools/url-tool";
 import { toolDefinitions, type ToolSlug } from "@/lib/tools/registry";
@@ -12,6 +14,8 @@ function ActiveTool({ slug }: { slug: ToolSlug }) {
   if (slug === "file-to-base64") return <FileBase64Tool />;
   if (slug === "url-encode-decode") return <UrlTool />;
   if (slug === "json-beautifier") return <JsonBeautifierTool />;
+  if (slug === "text-diff") return <TextDiffTool />;
+  if (slug === "timestamp-lab") return <TimestampLabTool />;
   if (slug === "ruby-compiler") return <RubyCompilerTool />;
   return <UpcomingTool />;
 }

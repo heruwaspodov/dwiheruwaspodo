@@ -28,6 +28,20 @@ export const toolDefinitions = [
     accent: "green",
   },
   {
+    slug: "text-diff",
+    label: "Text Diff",
+    title: "Online Text Diff Checker",
+    description: "Compare two text blocks line by line and highlight added, removed, and unchanged content locally.",
+    accent: "red",
+  },
+  {
+    slug: "timestamp-lab",
+    label: "Timestamp Lab",
+    title: "Unix Timestamp and Timezone Converter",
+    description: "Convert Unix timestamps and translate local date-times between IANA timezones in your browser.",
+    accent: "yellow",
+  },
+  {
     slug: "ruby-compiler",
     label: "Ruby Compiler",
     title: "Online Ruby Compiler",

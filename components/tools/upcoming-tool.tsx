@@ -1,8 +1,8 @@
 const upcomingTools = [
   ["JWT Inspector", "Decode token headers and payloads locally."],
-  ["Timestamp Lab", "Convert Unix timestamps and time zones."],
   ["UUID Generator", "Generate UUID values in the browser."],
-  ["Text Diff", "Compare two blocks of text line by line."],
+  ["Regex Playground", "Test patterns and capture groups locally."],
+  ["Color Converter", "Translate HEX, RGB, and HSL color values."],
 ];
 
 export function UpcomingTool() {
