@@ -7,10 +7,10 @@ export const toolDefinitions = [
     accent: "blue",
   },
   {
-    slug: "image-to-base64",
-    label: "Image ↔ Base64",
-    title: "Image to Base64 Converter",
-    description: "Encode an image as a Base64 data URL or preview Base64 image data without uploading the file.",
+    slug: "file-to-base64",
+    label: "File ↔ Base64",
+    title: "File to Base64 Converter",
+    description: "Encode any file as a Base64 data URL or decode Base64 into a downloadable file, with previews for image files.",
     accent: "yellow",
   },
   {
@@ -21,11 +21,18 @@ export const toolDefinitions = [
     accent: "red",
   },
   {
+    slug: "json-beautifier",
+    label: "JSON Beautifier",
+    title: "JSON Beautifier, Validator and CSV Converter",
+    description: "Beautify, minify, validate, and convert JSON objects to CSV locally in your browser.",
+    accent: "green",
+  },
+  {
     slug: "ruby-compiler",
     label: "Ruby Compiler",
     title: "Online Ruby Compiler",
-    description: "Run Ruby code privately in your browser with the official CRuby WebAssembly runtime.",
-    accent: "green",
+    description: "Write and run Ruby using the embedded OneCompiler editor and execution service.",
+    accent: "blue",
   },
   {
     slug: "upcoming",

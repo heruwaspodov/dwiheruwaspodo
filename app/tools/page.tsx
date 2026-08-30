@@ -4,16 +4,16 @@ import { toolDefinitions } from "@/lib/tools/registry";
 
 export const metadata: Metadata = {
   title: "Developer Tools",
-  description: "A catalog of browser-based developer utilities for Ruby, JSON, Base64 images, URL encoding, and everyday workflows.",
+  description: "A catalog of developer utilities for Ruby, JSON, file-to-Base64 conversion, URL encoding, and everyday workflows.",
   alternates: { canonical: "/tools/" },
   openGraph: {
     title: "Developer Tools | Dwi Heru",
-    description: "A catalog of browser-based developer utilities for Ruby, JSON, Base64 images, URL encoding, and everyday workflows.",
+    description: "A catalog of developer utilities for Ruby, JSON, file-to-Base64 conversion, URL encoding, and everyday workflows.",
     url: "/tools/",
   },
   twitter: {
     title: "Developer Tools | Dwi Heru",
-    description: "A catalog of browser-based developer utilities for Ruby, JSON, Base64 images, URL encoding, and everyday workflows.",
+    description: "A catalog of developer utilities for Ruby, JSON, file-to-Base64 conversion, URL encoding, and everyday workflows.",
   },
 };
 
@@ -22,7 +22,7 @@ export default function ToolsPage() {
     <>
       <section className="page-hero shell">
         <div className="section-heading"><p>UTILITY_BELT / LOCAL PROCESSING</p><h1>DEV TOOLS</h1></div>
-        <p className="page-lede">Small tools for repetitive developer work. Inputs stay in the browser unless a future tool explicitly says otherwise.</p>
+        <p className="page-lede">Small tools for repetitive developer work. Most processing stays in your browser; tools using third-party execution are clearly marked.</p>
       </section>
       <section className="tool-catalog shell" aria-label="Available developer tools">
         {toolDefinitions.map((tool, index) => (

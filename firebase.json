@@ -5,6 +5,18 @@
     "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
     "cleanUrls": true,
     "trailingSlash": true,
+    "redirects": [
+      {
+        "source": "/tools/image-to-base64",
+        "destination": "/tools/file-to-base64/",
+        "type": 301
+      },
+      {
+        "source": "/tools/image-to-base64/**",
+        "destination": "/tools/file-to-base64/",
+        "type": 301
+      }
+    ],
     "headers": [
       {
         "source": "/robots.txt",
