@@ -273,7 +273,7 @@ img { max-width: 100%; }
   .hero-copy { display: contents; }
   .eyebrow { grid-row: 1; justify-self: start; margin: 0; }
   .hero h1 { grid-row: 2; max-width: 100%; padding-block: 6px 12px; font-size: clamp(64px, 20vw, 94px); line-height: .9; letter-spacing: -.055em; }
-  .crt-stage { grid-row: 3; min-height: 400px; margin: -12px 0 -4px; }
+  .crt-stage { grid-row: 3; min-height: 400px; margin: -12px 0 24px; }
   .crt-stage canvas { height: 400px !important; }
   .role-stamp { grid-row: 4; justify-self: start; margin: 0; }
   .hero-intro { grid-row: 5; font-size: 13px; }
@@ -304,7 +304,7 @@ img { max-width: 100%; }
 @media (max-width: 410px) {
   .brand-copy { display: none; }
   .hero h1 { font-size: clamp(58px, 19vw, 70px); line-height: .92; }
-  .crt-stage { min-height: 275px; }
+  .crt-stage { min-height: 275px; margin-bottom: 26px; }
   .crt-stage canvas { height: 275px !important; }
   .service-grid, .company-grid, .tool-menu { grid-template-columns: 1fr; }
   .company-card:last-child { grid-column: auto; }
