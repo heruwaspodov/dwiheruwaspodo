@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { CharacterCounterTool } from "@/components/tools/character-counter-tool";
 import { FileBase64Tool } from "@/components/tools/file-base64-tool";
 import { JsonBeautifierTool } from "@/components/tools/json-beautifier-tool";
 import { RubyCompilerTool } from "@/components/tools/ruby-compiler-tool";
@@ -19,6 +20,7 @@ function ActiveTool({ slug }: { slug: ToolSlug }) {
   if (slug === "timestamp-lab") return <TimestampLabTool />;
   if (slug === "uuid-generator") return <UuidGeneratorTool />;
   if (slug === "ruby-compiler") return <RubyCompilerTool />;
+  if (slug === "character-counter") return <CharacterCounterTool />;
   return <UpcomingTool />;
 }
 

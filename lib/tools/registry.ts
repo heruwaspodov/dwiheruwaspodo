@@ -56,6 +56,13 @@ export const toolDefinitions = [
     accent: "blue",
   },
   {
+    slug: "character-counter",
+    label: "Character Counter",
+    title: "Unicode Character Counter",
+    description: "Count visible characters, words, lines, Unicode code points, UTF-16 units, and UTF-8 bytes with accurate emoji handling.",
+    accent: "green",
+  },
+  {
     slug: "upcoming",
     label: "Upcoming Tools",
     title: "Upcoming Developer Tools",
