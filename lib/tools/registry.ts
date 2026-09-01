@@ -63,11 +63,18 @@ export const toolDefinitions = [
     accent: "red",
   },
   {
+    slug: "openapi-docs-viewer",
+    label: "OpenAPI Docs",
+    title: "OpenAPI Documentation Viewer",
+    description: "Render interactive Scalar API documentation from an OpenAPI JSON or YAML URL, with Scalar proxy support for CORS-heavy APIs.",
+    accent: "green",
+  },
+  {
     slug: "upcoming",
     label: "Upcoming Tools",
     title: "Upcoming Developer Tools",
     description: "Preview the small developer utilities planned for the next workbench updates.",
-    accent: "green",
+    accent: "cream",
   },
 ] as const;
 

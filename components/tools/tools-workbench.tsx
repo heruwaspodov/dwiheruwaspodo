@@ -2,6 +2,7 @@ import Link from "next/link";
 import { CharacterCounterTool } from "@/components/tools/character-counter-tool";
 import { FileBase64Tool } from "@/components/tools/file-base64-tool";
 import { JsonBeautifierTool } from "@/components/tools/json-beautifier-tool";
+import { OpenApiDocsTool } from "@/components/tools/openapi-docs-tool";
 import { RubyCompilerTool } from "@/components/tools/ruby-compiler-tool";
 import { RubyJsonTool } from "@/components/tools/ruby-json-tool";
 import { TextDiffTool } from "@/components/tools/text-diff-tool";
@@ -21,6 +22,7 @@ function ActiveTool({ slug }: { slug: ToolSlug }) {
   if (slug === "uuid-generator") return <UuidGeneratorTool />;
   if (slug === "ruby-compiler") return <RubyCompilerTool />;
   if (slug === "character-counter") return <CharacterCounterTool />;
+  if (slug === "openapi-docs-viewer") return <OpenApiDocsTool />;
   return <UpcomingTool />;
 }
 

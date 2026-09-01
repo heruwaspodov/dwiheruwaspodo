@@ -20,6 +20,7 @@ Built with modern web technologies for performance and scalability:
 - **Frontend:**
   - **Next.js App Router + TypeScript:** Static route generation, metadata, and client navigation.
   - **React Three Fiber:** Low-poly CRT landing experience with a semantic fallback.
+  - **Scalar API Reference:** Embedded OpenAPI documentation viewer with Scalar proxy support.
   - **Custom CSS:** Oldish neobrutalist visual system with responsive layouts and reduced-motion support.
 
 - **Backend / Infrastructure:**
@@ -38,7 +39,7 @@ Built with modern web technologies for performance and scalability:
     - Projects are fetched from the `works` collection in Firestore.
     - Includes category filters and a crawlable detail page for every project.
 2.  **Developer Utility Belt:**
-    - Ruby Hash ↔ JSON, File ↔ Base64, URL encode/decode, text diff, timestamp, UUID, Ruby compiler, and Unicode character counting tools.
+    - Ruby Hash ↔ JSON, File ↔ Base64, URL encode/decode, text diff, timestamp, UUID, Ruby compiler, Unicode character counting, and OpenAPI documentation viewing tools.
     - The tool registry is prepared for additional daily utilities.
 3.  **Real-time Data:**
     - Firestore is captured during the production build for crawlable HTML, then refreshed in the browser after hydration.
