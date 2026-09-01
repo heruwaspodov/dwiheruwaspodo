@@ -224,6 +224,9 @@ img { max-width: 100%; }
 .character-stat span { font-size: 9px; }
 .character-stat strong { display: block; margin-block: 7px 4px; font-family: var(--display); font-size: clamp(27px, 4vw, 40px); line-height: 1; overflow-wrap: anywhere; }
 .character-stat small { color: var(--muted); font-size: 8px; }
+.character-count-guide { margin-top: 18px; padding: 14px 16px; background: #1717130b; border-left: 5px solid var(--blue); font-family: var(--mono); font-size: 10px; line-height: 1.65; }
+.character-count-guide > strong { font-size: 9px; }
+.character-count-guide p { margin: 5px 0 0; }
 
 .tool-catalog { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; padding-bottom: 76px; }
 .tool-catalog-card { min-height: 260px; display: flex; flex-direction: column; padding: 24px; color: var(--ink); text-decoration: none; transition: transform .15s, box-shadow .15s; }
@@ -237,6 +240,7 @@ img { max-width: 100%; }
 .accent-red { color: var(--cream); background: var(--red); }
 .accent-green { background: var(--green); }
 .accent-cream { background: var(--cream); }
+.accent-pattern { background-image: repeating-linear-gradient(135deg, transparent 0 20px, #1717131a 20px 23px); }
 .tool-page-hero { padding-bottom: 34px; }
 .tool-page-hero .section-heading h1 { max-width: 1000px; font-size: clamp(40px, 6vw, 70px); }
 

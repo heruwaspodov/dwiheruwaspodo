@@ -26,7 +26,11 @@ export default function ToolsPage() {
       </section>
       <section className="tool-catalog shell" aria-label="Available developer tools">
         {toolDefinitions.map((tool, index) => (
-          <Link className={`brutal-card tool-catalog-card accent-${tool.accent}`} href={`/tools/${tool.slug}/`} key={tool.slug}>
+          <Link
+            className={`brutal-card tool-catalog-card accent-${tool.accent}${toolDefinitions.findIndex((candidate) => candidate.accent === tool.accent) < index ? " accent-pattern" : ""}`}
+            href={`/tools/${tool.slug}/`}
+            key={tool.slug}
+          >
             <span>{String(index + 1).padStart(2, "0")} / TOOL</span>
             <h2>{tool.title}</h2>
             <p>{tool.description}</p>
