@@ -367,6 +367,9 @@ deno_version = 2
 [functions.hello-tools]
 verify_jwt = false
 
+[functions.keep-alive]
+verify_jwt = false
+
 [analytics]
 enabled = true
 port = 54327

@@ -2,13 +2,23 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useEffect } from "react";
 import { useLivePortfolioData } from "@/lib/firebase/use-live-data";
 import type { PortfolioData } from "@/lib/firebase/types";
 import { companyLogo, compactCompany } from "@/lib/utils/format";
 import { CrtExperience } from "@/components/three/crt-experience";
 
+const keepAliveUrl = "https://xdthdhxliizokyrfiumb.supabase.co/functions/v1/keep-alive";
+
 export function HomeContent({ initialData }: { initialData: PortfolioData }) {
   const data = useLivePortfolioData(initialData);
+
+  useEffect(() => {
+    void fetch(keepAliveUrl, {
+      cache: "no-store",
+      keepalive: true,
+    }).catch(() => undefined);
+  }, []);
 
   return (
     <>
