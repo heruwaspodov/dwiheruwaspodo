@@ -27,7 +27,7 @@ export default function ToolsPage() {
       <section className="tool-catalog shell" aria-label="Available developer tools">
         {toolDefinitions.map((tool, index) => (
           <Link
-            className={`brutal-card tool-catalog-card accent-${tool.accent}${toolDefinitions.findIndex((candidate) => candidate.accent === tool.accent) < index ? " accent-pattern" : ""}`}
+            className={`brutal-card tool-catalog-card accent-${tool.accent}`}
             href={`/tools/${tool.slug}/`}
             key={tool.slug}
           >

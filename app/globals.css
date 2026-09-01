@@ -6,6 +6,7 @@
   --yellow: #ffd84a;
   --blue: #5bb7e8;
   --green: #84b85d;
+  --pink: #ff9ec7;
   --muted: #6b685f;
   --line: 3px solid var(--ink);
   --shadow: 7px 7px 0 var(--ink);
@@ -240,7 +241,7 @@ img { max-width: 100%; }
 .accent-red { color: var(--cream); background: var(--red); }
 .accent-green { background: var(--green); }
 .accent-cream { background: var(--cream); }
-.accent-pattern { background-image: repeating-linear-gradient(135deg, transparent 0 20px, #1717131a 20px 23px); }
+.accent-pink { background: var(--pink); }
 .tool-page-hero { padding-bottom: 34px; }
 .tool-page-hero .section-heading h1 { max-width: 1000px; font-size: clamp(40px, 6vw, 70px); }
 
