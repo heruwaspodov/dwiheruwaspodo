@@ -1,5 +1,5 @@
 export const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY ?? "REMOVED_GOOGLE_API_KEY",
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY ?? "",
   authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN ?? "dwiheruwaspodo.firebaseapp.com",
   databaseURL: process.env.NEXT_PUBLIC_FIREBASE_DATABASE_URL ?? "https://dwiheruwaspodo.firebaseio.com",
   projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID ?? "dwiheruwaspodo",

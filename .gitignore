@@ -9,6 +9,7 @@ dist/
 build/
 out/
 .next/
+assets/js/firebase-init.js
 
 # TypeScript
 *.tsbuildinfo
