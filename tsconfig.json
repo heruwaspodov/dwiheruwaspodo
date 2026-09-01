@@ -40,6 +40,7 @@
     "build",
     "out",
     "assets",
+    "supabase/functions",
     "migrate.js"
   ]
 }
