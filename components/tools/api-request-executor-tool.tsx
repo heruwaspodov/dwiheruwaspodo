@@ -1,19 +1,8 @@
 "use client";
 
-import dynamic from "next/dynamic";
 import { useMemo, useState } from "react";
-import type { AnyApiReferenceConfiguration } from "@scalar/api-reference-react";
-
-const ApiReferenceReact = dynamic(
-  () => import("@scalar/api-reference-react").then((mod) => mod.ApiReferenceReact),
-  {
-    ssr: false,
-    loading: () => <div className="scalar-loading">LOADING API DOCS...</div>,
-  },
-);
 
 const scalarProxyUrl = "https://proxy.scalar.com";
-const sampleSpecUrl = "https://registry.scalar.com/@scalar/apis/galaxy/latest?format=yaml";
 const sampleRequestUrl = "https://void.scalar.com/foobar";
 const httpMethods = ["GET", "POST", "PUT", "PATCH", "DELETE"] as const;
 const snippetTargets = ["cURL", "JavaScript Fetch", "Axios", "Python Requests", "PHP cURL", "Ruby Net::HTTP"] as const;
@@ -67,7 +56,7 @@ function formatBody(body: string) {
 function activeRows(rows: KeyValueRow[]) {
   return rows
     .map((row) => ({ key: row.key.trim(), value: row.value }))
-    .filter((row) => row.key && row.key !== "scalar_url");
+    .filter((row) => row.key);
 }
 
 function shellQuote(value: string) {
@@ -173,29 +162,16 @@ function buildCodeSnippet({
   return lines.join(" \\\n");
 }
 
-export function OpenApiDocsTool() {
-  const [activeMode, setActiveMode] = useState<"docs" | "request">("docs");
-  const [specUrl, setSpecUrl] = useState(sampleSpecUrl);
-  const [loadedSpecUrl, setLoadedSpecUrl] = useState(sampleSpecUrl);
+export function ApiRequestExecutorTool() {
   const [method, setMethod] = useState<HttpMethod>("GET");
   const [targetUrl, setTargetUrl] = useState(sampleRequestUrl);
-  const [queryRows, setQueryRows] = useState<KeyValueRow[]>([createRow("scalar_url", sampleRequestUrl)]);
+  const [queryRows, setQueryRows] = useState<KeyValueRow[]>([createRow()]);
   const [headerRows, setHeaderRows] = useState<KeyValueRow[]>([createRow("accept", "application/json")]);
   const [body, setBody] = useState("");
   const [snippetTarget, setSnippetTarget] = useState<SnippetTarget>("cURL");
   const [requestResult, setRequestResult] = useState<RequestResult | null>(null);
   const [requestError, setRequestError] = useState("");
   const [isSending, setIsSending] = useState(false);
-
-  const configuration = useMemo<AnyApiReferenceConfiguration>(
-    () => ({
-      url: loadedSpecUrl,
-      proxyUrl: scalarProxyUrl,
-      hideDownloadButton: false,
-      theme: "default",
-    }),
-    [loadedSpecUrl],
-  );
 
   const proxyRequestUrl = useMemo(() => {
     const proxyUrl = new URL(scalarProxyUrl);
@@ -204,7 +180,7 @@ export function OpenApiDocsTool() {
     proxyUrl.searchParams.set("scalar_url", normalizedTarget);
     queryRows.forEach((row) => {
       const key = row.key.trim();
-      if (!key || key === "scalar_url") return;
+      if (!key) return;
       proxyUrl.searchParams.append(key, row.value);
     });
 
@@ -266,62 +242,12 @@ export function OpenApiDocsTool() {
 
   return (
     <>
-      <h2>OpenAPI Tools</h2>
-      <p>View OpenAPI docs or send one-off API requests through Scalar proxy.</p>
+      <h2>API Request Executor</h2>
+      <p>Send one-off API requests through Scalar proxy to reduce browser CORS friction.</p>
 
-      <div className="tool-mode-switch" role="tablist" aria-label="OpenAPI tool modes">
-        <button type="button" role="tab" aria-selected={activeMode === "docs"} onClick={() => setActiveMode("docs")}>
-          VIEW DOCS
-        </button>
-        <button type="button" role="tab" aria-selected={activeMode === "request"} onClick={() => setActiveMode("request")}>
-          SEND REQUEST
-        </button>
-      </div>
-
-      {activeMode === "docs" ? (
-        <section className="tool-mode-panel" aria-label="Open documentation viewer">
-          <h3>01 / OPEN DOCUMENTATION VIEWER</h3>
-          <p>Render interactive Scalar docs from an OpenAPI JSON or YAML URL.</p>
-
-          <label className="field-label">
-            OPENAPI SPEC URL
-            <input
-              className="tool-input"
-              inputMode="url"
-              onChange={(event) => setSpecUrl(event.target.value)}
-              placeholder="https://example.com/openapi.json"
-              type="url"
-              value={specUrl}
-            />
-          </label>
-
-          <div className="tool-actions">
-            <button type="button" onClick={() => setLoadedSpecUrl(specUrl.trim() || sampleSpecUrl)}>
-              LOAD DOCS
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setSpecUrl(sampleSpecUrl);
-                setLoadedSpecUrl(sampleSpecUrl);
-              }}
-            >
-              RESET SAMPLE
-            </button>
-          </div>
-
-          <p className="runtime-note">
-            SPEC: {loadedSpecUrl} · PROXY: {scalarProxyUrl}
-          </p>
-
-          <div className="scalar-reference-shell">
-            <ApiReferenceReact configuration={configuration} />
-          </div>
-        </section>
-      ) : (
-        <section className="tool-mode-panel" aria-label="Execute request">
-          <h3>02 / EXECUTE REQUEST</h3>
-          <p>Send a single API request through Scalar proxy. Headers and body stay only in this browser session.</p>
+      <section className="tool-mode-panel" aria-label="Execute request">
+          <h3>SCALAR PROXY REQUESTER</h3>
+          <p>Fill the real target URL here. The tool automatically wraps it as a Scalar proxy request using the required scalar_url parameter.</p>
 
           <div className="request-line">
             <label className="field-label">
@@ -339,12 +265,7 @@ export function OpenApiDocsTool() {
               <input
                 className="tool-input"
                 inputMode="url"
-                onChange={(event) => {
-                  setTargetUrl(event.target.value);
-                  setQueryRows((rows) =>
-                    rows.map((row) => (row.key === "scalar_url" ? { ...row, value: event.target.value } : row)),
-                  );
-                }}
+                onChange={(event) => setTargetUrl(event.target.value)}
                 placeholder="https://api.example.com/users"
                 type="url"
                 value={targetUrl}
@@ -355,7 +276,7 @@ export function OpenApiDocsTool() {
           <KeyValueEditor
             label="QUERY PARAMETERS"
             onAdd={() => setQueryRows((rows) => [...rows, createRow()])}
-            onRemove={(id) => setQueryRows((rows) => rows.filter((row) => row.id !== id || row.key === "scalar_url"))}
+            onRemove={(id) => setQueryRows((rows) => rows.filter((row) => row.id !== id))}
             onUpdate={(id, field, value) => setQueryRows((rows) => updateRows(rows, id, field, value))}
             rows={queryRows}
           />
@@ -388,7 +309,7 @@ export function OpenApiDocsTool() {
               onClick={() => {
                 setMethod("GET");
                 setTargetUrl(sampleRequestUrl);
-                setQueryRows([createRow("scalar_url", sampleRequestUrl)]);
+                setQueryRows([createRow()]);
                 setHeaderRows([createRow("accept", "application/json")]);
                 setBody("");
                 setRequestResult(null);
@@ -449,7 +370,6 @@ export function OpenApiDocsTool() {
             </div>
           ) : null}
         </section>
-      )}
     </>
   );
 }
@@ -482,7 +402,6 @@ function KeyValueEditor({
             className="tool-input"
             onChange={(event) => onUpdate(row.id, "key", event.target.value)}
             placeholder="key"
-            readOnly={row.key === "scalar_url"}
             value={row.key}
           />
           <input
@@ -492,7 +411,7 @@ function KeyValueEditor({
             placeholder="value"
             value={row.value}
           />
-          <button type="button" disabled={row.key === "scalar_url"} onClick={() => onRemove(row.id)}>
+          <button type="button" onClick={() => onRemove(row.id)}>
             −
           </button>
         </div>

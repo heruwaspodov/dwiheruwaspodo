@@ -63,10 +63,10 @@ export const toolDefinitions = [
     accent: "red",
   },
   {
-    slug: "openapi-docs-viewer",
-    label: "OpenAPI Docs",
-    title: "OpenAPI Documentation Viewer",
-    description: "Render interactive Scalar API documentation from an OpenAPI JSON or YAML URL, with Scalar proxy support for CORS-heavy APIs.",
+    slug: "api-request-executor",
+    label: "API Requester",
+    title: "API Request Executor",
+    description: "Send one-off API requests through Scalar proxy, inspect responses, and generate reusable code snippets.",
     accent: "green",
   },
   {
