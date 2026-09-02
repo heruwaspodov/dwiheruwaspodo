@@ -1,10 +1,10 @@
 import Link from "next/link";
 import { CharacterCounterTool } from "@/components/tools/character-counter-tool";
 import { FileBase64Tool } from "@/components/tools/file-base64-tool";
+import { HttpClientTool } from "@/components/tools/http-client-tool";
 import { JsonBeautifierTool } from "@/components/tools/json-beautifier-tool";
 import { RubyCompilerTool } from "@/components/tools/ruby-compiler-tool";
 import { RubyJsonTool } from "@/components/tools/ruby-json-tool";
-import { ScalarApiClientTool } from "@/components/tools/scalar-api-client-tool";
 import { TextDiffTool } from "@/components/tools/text-diff-tool";
 import { TimestampLabTool } from "@/components/tools/timestamp-lab-tool";
 import { UpcomingTool } from "@/components/tools/upcoming-tool";
@@ -22,7 +22,7 @@ function ActiveTool({ slug }: { slug: ToolSlug }) {
   if (slug === "uuid-generator") return <UuidGeneratorTool />;
   if (slug === "ruby-compiler") return <RubyCompilerTool />;
   if (slug === "character-counter") return <CharacterCounterTool />;
-  if (slug === "scalar-api-client") return <ScalarApiClientTool />;
+  if (slug === "http-client") return <HttpClientTool />;
   return <UpcomingTool />;
 }
 

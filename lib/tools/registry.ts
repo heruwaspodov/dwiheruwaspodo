@@ -63,9 +63,9 @@ export const toolDefinitions = [
     accent: "red",
   },
   {
-    slug: "scalar-api-client",
-    label: "Scalar API Client",
-    title: "Scalar API Client",
+    slug: "http-client",
+    label: "HTTP Client",
+    title: "HTTP Request Client",
     description: "Use Scalar's hosted API client to send requests, inspect responses, manage auth, and generate code snippets.",
     accent: "green",
   },

@@ -1,16 +1,16 @@
 const scalarClientUrl = "https://client.scalar.com/@local/default/document/drafts/path/%252F/method/get/example/default";
 
-export function ScalarApiClientTool() {
+export function HttpClientTool() {
   return (
     <>
-      <h2>Scalar API Client</h2>
+      <h2>HTTP Client</h2>
       <p>Use Scalar&apos;s hosted API client to send requests, inspect responses, manage auth, and generate code snippets.</p>
 
-      <div className="scalar-client-embed-shell">
+      <div className="http-client-embed-shell">
         <iframe
-          className="scalar-client-embed"
+          className="http-client-embed"
           src={scalarClientUrl}
-          title="Scalar API Client"
+          title="HTTP Client"
           loading="lazy"
           referrerPolicy="strict-origin-when-cross-origin"
           allow="clipboard-read; clipboard-write"
