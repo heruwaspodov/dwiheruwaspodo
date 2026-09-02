@@ -63,10 +63,10 @@ export const toolDefinitions = [
     accent: "red",
   },
   {
-    slug: "api-request-executor",
-    label: "API Requester",
-    title: "API Request Executor",
-    description: "Send one-off API requests through Scalar proxy, inspect responses, and generate reusable code snippets.",
+    slug: "scalar-api-client",
+    label: "Scalar API Client",
+    title: "Scalar API Client",
+    description: "Use Scalar's hosted API client to send requests, inspect responses, manage auth, and generate code snippets.",
     accent: "green",
   },
   {
