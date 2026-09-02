@@ -16,8 +16,10 @@ const scalarProxyUrl = "https://proxy.scalar.com";
 const sampleSpecUrl = "https://registry.scalar.com/@scalar/apis/galaxy/latest?format=yaml";
 const sampleRequestUrl = "https://void.scalar.com/foobar";
 const httpMethods = ["GET", "POST", "PUT", "PATCH", "DELETE"] as const;
+const snippetTargets = ["cURL", "JavaScript Fetch", "Axios", "Python Requests", "PHP cURL", "Ruby Net::HTTP"] as const;
 
 type HttpMethod = (typeof httpMethods)[number];
+type SnippetTarget = (typeof snippetTargets)[number];
 type KeyValueRow = {
   id: string;
   key: string;
@@ -62,6 +64,115 @@ function formatBody(body: string) {
   }
 }
 
+function activeRows(rows: KeyValueRow[]) {
+  return rows
+    .map((row) => ({ key: row.key.trim(), value: row.value }))
+    .filter((row) => row.key && row.key !== "scalar_url");
+}
+
+function shellQuote(value: string) {
+  return `'${value.replaceAll("'", "'\\''")}'`;
+}
+
+function jsQuote(value: string) {
+  return JSON.stringify(value);
+}
+
+function phpQuote(value: string) {
+  return `'${value.replaceAll("\\", "\\\\").replaceAll("'", "\\'")}'`;
+}
+
+function rubyQuote(value: string) {
+  return `"${value.replaceAll("\\", "\\\\").replaceAll('"', '\\"')}"`;
+}
+
+function buildCodeSnippet({
+  body,
+  headers,
+  method,
+  proxyRequestUrl,
+  target,
+}: {
+  body: string;
+  headers: KeyValueRow[];
+  method: HttpMethod;
+  proxyRequestUrl: string;
+  target: SnippetTarget;
+}) {
+  const headerRows = activeRows(headers);
+  const canSendBody = method !== "GET" && body.length > 0;
+
+  if (target === "JavaScript Fetch") {
+    const options = [`method: ${jsQuote(method)}`];
+    if (headerRows.length) {
+      options.push(`headers: {\n${headerRows.map((row) => `    ${jsQuote(row.key)}: ${jsQuote(row.value)}`).join(",\n")}\n  }`);
+    }
+    if (canSendBody) options.push(`body: ${jsQuote(body)}`);
+
+    return `const response = await fetch(${jsQuote(proxyRequestUrl)}, {\n  ${options.join(",\n  ")}\n});\n\nconst data = await response.text();\nconsole.log(response.status, data);`;
+  }
+
+  if (target === "Axios") {
+    const options = [`method: ${jsQuote(method.toLowerCase())}`, `url: ${jsQuote(proxyRequestUrl)}`];
+    if (headerRows.length) {
+      options.push(`headers: {\n${headerRows.map((row) => `    ${jsQuote(row.key)}: ${jsQuote(row.value)}`).join(",\n")}\n  }`);
+    }
+    if (canSendBody) options.push(`data: ${jsQuote(body)}`);
+
+    return `import axios from "axios";\n\nconst response = await axios({\n  ${options.join(",\n  ")}\n});\n\nconsole.log(response.status, response.data);`;
+  }
+
+  if (target === "Python Requests") {
+    const lines = ["import requests", "", `url = ${jsQuote(proxyRequestUrl)}`];
+    if (headerRows.length) {
+      lines.push("headers = {");
+      lines.push(...headerRows.map((row) => `    ${jsQuote(row.key)}: ${jsQuote(row.value)},`));
+      lines.push("}");
+    }
+    if (canSendBody) lines.push(`body = ${jsQuote(body)}`);
+    lines.push("");
+    lines.push(
+      `response = requests.request(${jsQuote(method)}, url${headerRows.length ? ", headers=headers" : ""}${canSendBody ? ", data=body" : ""})`,
+    );
+    lines.push("print(response.status_code)");
+    lines.push("print(response.text)");
+    return lines.join("\n");
+  }
+
+  if (target === "PHP cURL") {
+    const lines = ["<?php", `$curl = curl_init();`, "", "curl_setopt_array($curl, ["];
+    lines.push(`    CURLOPT_URL => ${phpQuote(proxyRequestUrl)},`);
+    lines.push("    CURLOPT_RETURNTRANSFER => true,");
+    lines.push(`    CURLOPT_CUSTOMREQUEST => ${phpQuote(method)},`);
+    if (headerRows.length) {
+      lines.push("    CURLOPT_HTTPHEADER => [");
+      lines.push(...headerRows.map((row) => `        ${phpQuote(`${row.key}: ${row.value}`)},`));
+      lines.push("    ],");
+    }
+    if (canSendBody) lines.push(`    CURLOPT_POSTFIELDS => ${phpQuote(body)},`);
+    lines.push("]);", "", "$response = curl_exec($curl);", "$status = curl_getinfo($curl, CURLINFO_HTTP_CODE);", "curl_close($curl);", "", "echo $status . PHP_EOL;", "echo $response;");
+    return lines.join("\n");
+  }
+
+  if (target === "Ruby Net::HTTP") {
+    const lines = ["require 'net/http'", "require 'uri'", "", `uri = URI.parse(${rubyQuote(proxyRequestUrl)})`, "request = Net::HTTPGenericRequest.new("];
+    lines.push(`  ${rubyQuote(method)},`);
+    lines.push("  false,");
+    lines.push(`  ${canSendBody ? "true" : "false"},`);
+    lines.push("  uri.request_uri");
+    lines.push(")");
+    headerRows.forEach((row) => lines.push(`request[${rubyQuote(row.key)}] = ${rubyQuote(row.value)}`));
+    if (canSendBody) lines.push(`request.body = ${rubyQuote(body)}`);
+    lines.push("", "response = Net::HTTP.start(uri.hostname, uri.port, use_ssl: uri.scheme == 'https') do |http|", "  http.request(request)", "end", "", "puts response.code", "puts response.body");
+    return lines.join("\n");
+  }
+
+  const lines = [`curl ${shellQuote(proxyRequestUrl)}`, `  --request ${shellQuote(method)}`];
+  headerRows.forEach((row) => lines.push(`  --header ${shellQuote(`${row.key}: ${row.value}`)}`));
+  if (canSendBody) lines.push(`  --data ${shellQuote(body)}`);
+  return lines.join(" \\\n");
+}
+
 export function OpenApiDocsTool() {
   const [activeMode, setActiveMode] = useState<"docs" | "request">("docs");
   const [specUrl, setSpecUrl] = useState(sampleSpecUrl);
@@ -71,6 +182,7 @@ export function OpenApiDocsTool() {
   const [queryRows, setQueryRows] = useState<KeyValueRow[]>([createRow("scalar_url", sampleRequestUrl)]);
   const [headerRows, setHeaderRows] = useState<KeyValueRow[]>([createRow("accept", "application/json")]);
   const [body, setBody] = useState("");
+  const [snippetTarget, setSnippetTarget] = useState<SnippetTarget>("cURL");
   const [requestResult, setRequestResult] = useState<RequestResult | null>(null);
   const [requestError, setRequestError] = useState("");
   const [isSending, setIsSending] = useState(false);
@@ -98,6 +210,18 @@ export function OpenApiDocsTool() {
 
     return proxyUrl.toString();
   }, [queryRows, targetUrl]);
+
+  const codeSnippet = useMemo(
+    () =>
+      buildCodeSnippet({
+        body,
+        headers: headerRows,
+        method,
+        proxyRequestUrl,
+        target: snippetTarget,
+      }),
+    [body, headerRows, method, proxyRequestUrl, snippetTarget],
+  );
 
   const sendRequest = async () => {
     setRequestError("");
@@ -276,6 +400,30 @@ export function OpenApiDocsTool() {
           </div>
 
           <p className="runtime-note">PROXY REQUEST: {proxyRequestUrl}</p>
+
+          <div className="code-snippet-panel">
+            <div className="response-toolbar">
+              <strong>CODE SNIPPET</strong>
+              <div className="snippet-actions">
+                <select
+                  aria-label="Code snippet language"
+                  className="snippet-select"
+                  value={snippetTarget}
+                  onChange={(event) => setSnippetTarget(event.target.value as SnippetTarget)}
+                >
+                  {snippetTargets.map((target) => (
+                    <option key={target} value={target}>
+                      {target}
+                    </option>
+                  ))}
+                </select>
+                <button type="button" onClick={() => navigator.clipboard?.writeText(codeSnippet)}>
+                  COPY CODE
+                </button>
+              </div>
+            </div>
+            <pre>{codeSnippet}</pre>
+          </div>
 
           {requestError ? <p className="tool-error">{requestError}</p> : null}
 

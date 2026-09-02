@@ -202,14 +202,17 @@ img { max-width: 100%; }
 .key-value-row button:disabled { cursor: not-allowed; opacity: .5; box-shadow: none; }
 .request-body { min-height: 150px; }
 .request-response { margin-top: 20px; border: var(--line); box-shadow: 5px 5px 0 var(--ink); background: #151a16; color: #dce9d5; overflow: hidden; }
+.code-snippet-panel { margin-top: 20px; border: var(--line); box-shadow: 5px 5px 0 var(--ink); background: #151a16; color: #dce9d5; overflow: hidden; }
 .request-response-status { padding: 12px 14px; border-bottom: 2px solid #3f493f; font-family: var(--mono); font-size: 11px; font-weight: 900; }
 .request-response-status.ok { color: #9fdaa8; }
 .request-response-status.error { color: #ff9b8e; }
 .request-response details { border-bottom: 1px solid #3f493f; }
 .request-response summary { padding: 12px 14px; cursor: pointer; font-family: var(--mono); font-size: 10px; font-weight: 900; }
-.request-response pre { max-height: 430px; margin: 0; padding: 13px 14px; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere; font-family: var(--mono); font-size: 11px; line-height: 1.65; }
+.request-response pre, .code-snippet-panel pre { max-height: 430px; margin: 0; padding: 13px 14px; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere; font-family: var(--mono); font-size: 11px; line-height: 1.65; }
 .response-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 14px 0; font-family: var(--mono); font-size: 10px; }
 .response-toolbar button { color: var(--ink); background: var(--yellow); }
+.snippet-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
+.snippet-select { min-height: 34px; max-width: 190px; color: var(--ink); background: var(--cream); border: 2px solid var(--ink); font-family: var(--mono); font-size: 9px; font-weight: 900; }
 .scalar-reference-shell { min-height: 720px; margin-top: 18px; border: var(--line); box-shadow: 6px 6px 0 var(--ink); overflow: hidden; background: #fff; }
 .scalar-reference-shell > div { min-height: 720px; }
 .scalar-loading { min-height: 360px; display: grid; place-items: center; background: var(--cream); font-family: var(--mono); font-size: 12px; font-weight: 900; }
